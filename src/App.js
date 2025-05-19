@@ -1,12 +1,15 @@
+
+import Header from './Components/Header';
+import HeroSection from './Components/HeroSection';
+import BestSellers from './Components/BestSellers';
+
 function App() {
   return (
     <div>
-      <h1>Bienvenue sur mon site !</h1>
-      <p>Ce site est construit avec React.</p>
-      <button>Hajar</button>
-      <button>Hajar2</button>
+      <Header />
+      <HeroSection />
+            <BestSellers />
     </div>
   );
 }
-
 export default App;
