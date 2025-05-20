@@ -6,7 +6,7 @@ function HeroSection() {
       <div className="container">
         <h1 className="display-4 fw-bold">Bienvenue chez FastMarket</h1>
         <p className="lead text-muted">Découvrez nos meilleures offres sur vos produits préférés !</p>
-        <a href="#sale" className="btn btn-primary btn-lg mt-3">Voir les Promotions</a>
+        <a href="#best-sellers" className="btn btn-warning btn-lg mt-3">Voir les Promotions</a>
       </div>
     </section>
   );
