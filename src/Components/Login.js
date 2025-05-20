@@ -8,7 +8,7 @@ export default function Login({ onLogin }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ✅ Simulation : identifiants valides = test@mail.com / 1234
+    //Simulation : identifiants valides = test@mail.com / 1234
     if (email === "test@mail.com" && password === "1234") {
       const fakeUser = { name: "Jean Dupont", email };
       const fakeToken = "abc123xyz";
