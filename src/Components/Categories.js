@@ -9,15 +9,19 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 
 const categoryData = [
-  { title: 'Fruits & Veges',   img: '/images/category-thumb-1.jpg' },
-  { title: 'Breads & Sweets',  img: '/images/category-thumb-2.jpg' },
-  { title: 'Fruits & Veges',   img: '/images/category-thumb-3.jpg' },
-  { title: 'Beverages',        img: '/images/category-thumb-4.jpg' },
-  { title: 'Meat Products',    img: '/images/category-thumb-5.jpg' },
-  { title: 'Breads',           img: '/images/category-thumb-6.jpg' },
-  { title: 'Fruits & Veges',   img: '/images/category-thumb-7.jpg' },
-  { title: 'Breads & Sweets',  img: '/images/category-thumb-8.jpg' },
-  // tu peux dupliquer/modifier à volonté
+  { title: 'Fruits & Légumes',   img: '/images/category-thumb-1.jpg' },
+  { title: 'Pains & Desserts',  img: '/images/category-thumb-2.jpg' },
+  { title: 'Boissons',   img: '/images/category-thumb-3.jpg' },
+  { title: 'Produits ménagers',        img: '/images/menage.jpeg' },
+  { title: 'Viandes & Volailles',    img: '/images/category-thumb-5.jpg' },
+  { title: 'Bébé & Puériculture',           img: '/images/bebe.jpeg' },
+  { title: 'Produits laitiers & Œufs',   img: '/images/category-thumb-7.jpg' },
+  { title: 'Surgelés',  img: '/images/surgele.jpeg' },
+   { title: 'Snacks & Chips',  img: '/images/snacks.jpeg' },
+    { title: 'Céréales & Petits-déjeuners',  img: '/images/cereals.jpeg' },
+   { title: 'Hygiène & soins personnels',  img: '/images/hygiene.jpeg' },
+   { title: 'Bio & Santé',  img: '/images/bio.jpeg' },
+
 ];
 
 function Categories() {
