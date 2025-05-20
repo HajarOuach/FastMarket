@@ -3,9 +3,11 @@ import { Routes, Route, Link, Navigate } from 'react-router-dom';
 import Header from './Components/Header';
 import HeroSection from './Components/HeroSection';
 import BestSellers from './Components/BestSellers';
+
 import Login from './Components/Login';
 import Catalogue from './Components/Catalogue';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Categories   from './Components/Categories';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -49,7 +51,7 @@ function App() {
         />
       </Routes>
     </>
-   
+  
   );
 }
 

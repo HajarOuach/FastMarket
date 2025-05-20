@@ -47,7 +47,7 @@ function Header() {
 
           {/* NAV LINKS */}
           <Col lg={3} className="d-none d-lg-flex justify-content-center gap-4 fw-bold text-uppercase">
-            <a href="#home" className="text-dark text-decoration-none">Home</a>
+            <a href="#" className="text-dark text-decoration-none">Home</a>
             <div className="dropdown">
               <a
                 className="text-dark text-decoration-none dropdown-toggle"
