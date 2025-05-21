@@ -29,13 +29,28 @@ export default function Login({ onLogin }) {
         // 🔍 Afficher les données reçues pour vérification
         console.log("Données utilisateur reçues :", client);
 
-        // (Optionnel mais recommandé) : enlever le mot de passe de l'objet avant stockage
+        // 🧹 Enlever le mot de passe avant stockage
         delete client.motDePasse;
 
-        // 💾 Stockage + appel fonction de connexion + redirection
+        // 💾 Stockage + appel fonction de connexion
         localStorage.setItem("client", JSON.stringify(client));
         if (onLogin) onLogin(client);
-        navigate("/accueil");
+
+        // 🔁 Redirection selon le rôle de l'utilisateur
+        switch (client.role) {
+          case "client":
+            navigate("/accueil");
+            break;
+          case "preparateur":
+            navigate("/preparateur");
+            break;
+          case "gerant":
+            navigate("/gerant");
+            break;
+          default:
+            navigate("/login"); // sécurité
+        }
+
       } else if (response.status === 401) {
         setErrorMessage("Email ou mot de passe incorrect.");
       } else {
