@@ -25,9 +25,19 @@ function Header() {
           <Col xs={12} md={6} lg={5} className="my-2 my-lg-0">
             <Form className="d-flex bg-light rounded-4 p-2">
               <Form.Select className="border-0 bg-transparent" style={{ maxWidth: 150 }}>
-                <option>Categories</option>
-                <option>Groceries</option>
-                <option>Drinks</option>
+                <option>catégories</option>
+                <option>Fruits & Légumes</option>
+                <option>Produits laitiers & Œufs</option>
+                <option>Viandes & Volailles</option>
+                <option>Boissons</option>
+                <option>Surgelés</option>
+                <option>Snacks & Chips</option>
+                <option>Céréales & Petits-déjeuners</option>
+                <option>Produits ménagers</option>
+                <option>Hygiène & soins personnels</option>
+                <option>Bio & Santé</option>
+                <option>Bébé & Puériculture</option>
+                <option>Pains & Desserts</option>
               </Form.Select>
               <FormControl
                 type="search"
@@ -57,7 +67,7 @@ function Header() {
                 Pages
               </a>
               <ul className="dropdown-menu">
-                <li><a className="dropdown-item" href="#about">About</a></li>
+                <li><a className="dropdown-item" href="#about">Promotions</a></li>
                 <li><a className="dropdown-item" href="#shop">Shop</a></li>
               </ul>
             </div>

@@ -8,9 +8,10 @@ import Login from './Components/Login';
 import Catalogue from './Components/Catalogue';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Categories   from './Components/Categories';
+import BestSellings from './Components/BestSellings';
 
 function App() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null); 
 
   const handleLogin = (userData) => {
     setUser(userData);
