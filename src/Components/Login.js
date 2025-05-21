@@ -1,22 +1,43 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 export default function Login({ onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate(); // hook pour redirection
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    //Simulation : identifiants valides = test@mail.com / 1234
-    if (email === "test@mail.com" && password === "1234") {
-      const fakeUser = { name: "Jean Dupont", email };
-      const fakeToken = "abc123xyz";
+    try {
+      const response = await fetch("http://10.12.72.233:8080/clients/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          motDePasse: password,
+        }),
+      });
 
-      localStorage.setItem("token", fakeToken);
-      onLogin(fakeUser);
-    } else {
-      alert("Identifiants incorrects. Essayez test@mail.com / 1234");
+      if (response.ok) {
+        const client = await response.json();
+
+        // Stocker client et rediriger
+        localStorage.setItem("client", JSON.stringify(client));
+        if (onLogin) onLogin(client); // si une fonction de connexion est passée
+        navigate("/accueil");
+      } else if (response.status === 401) {
+        setErrorMessage("Email ou mot de passe incorrect.");
+      } else {
+        setErrorMessage("Erreur inconnue du serveur.");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la connexion :", error);
+      setErrorMessage("Impossible de contacter le serveur.");
     }
   };
 
@@ -48,6 +69,12 @@ export default function Login({ onLogin }) {
               required
             />
           </div>
+
+          {errorMessage && (
+            <div className="alert alert-danger" role="alert">
+              {errorMessage}
+            </div>
+          )}
 
           <div className="d-grid">
             <button type="submit" className="btn btn-primary">
