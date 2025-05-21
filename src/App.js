@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Routes, Route, Link, Navigate } from 'react-router-dom';
 import Header from './Components/Header';
 import HeroSection from './Components/HeroSection';
-import BestSellers from './Components/BestSellers';
+import BestSellers from './Components/PromotionsAccueil';
 
 import Login from './Components/Login';
 import Catalogue from './Components/Catalogue';
@@ -19,15 +19,7 @@ function App() {
 
   return (
     <>
-      <nav className="navbar navbar-expand-lg navbar-light bg-light">
-        <div className="container">
-          <Link className="navbar-brand" to="/">Accueil</Link>
-          <div className="ms-auto">
-            <Link className="btn btn-outline-primary me-2" to="/">Home</Link>
-            <Link className="btn btn-primary" to="/catalogue">Catalogue</Link>
-          </div>
-        </div>
-      </nav>
+     
 
       <Routes>
         <Route
@@ -40,6 +32,10 @@ function App() {
                 <Header />
                 <HeroSection />
                 <BestSellers />
+                <Categories />
+                <BestSellings />
+           
+              
               </>
             )
           }
