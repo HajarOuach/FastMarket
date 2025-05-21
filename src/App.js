@@ -8,6 +8,8 @@ import Login from './Components/Login';
 import Catalogue from './Components/Catalogue';
 import Categories from './Components/Categories';
 import BestSellings from './Components/BestSellings';
+import Panier from './Components/Panier';
+
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -61,6 +63,11 @@ function App() {
           path="/catalogue"
           element={user ? <Catalogue /> : <Navigate to="/" />}
         />
+        <Route
+          path="/panier"
+          element={<Panier />} 
+        />
+        
       </Routes>
     
   );
