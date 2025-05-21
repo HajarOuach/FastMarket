@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Row, Col, Form, FormControl } from 'react-bootstrap';
+import { Container, Row, Col, Form, FormControl, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
 function Header() {
@@ -100,14 +100,14 @@ function Header() {
                 />
               </svg>
             </a>
-            <a href="#" className="text-dark text-decoration-none">
-              <svg width="20" height="20" viewBox="0 0 24 24">
-                <path
-                  fill="currentColor"
-                  d="M6 2h12a1 1 0 0 1 1 1v3H5V3a1 1 0 0 1 1-1Zm0 6h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V8Zm3 2v2h2v-2H9Zm4 0v2h2v-2h-2Z"
+            <Link to="/panier" className="text-dark text-decoration-none">
+              <svg width="24" height="24" viewBox="0 0 24 24">
+                <path fill="currentColor"
+                d="M6 2h12a1 1 0 0 1 1 1v3H5V3a1 1 0 0 1 1-1Zm0 6h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V8Zm3 2v2h2v-2H9Zm4 0v2h2v-2h-2Z"
                 />
-              </svg>
-            </a>
+             </svg>
+          </Link>
+
           </Col>
         </Row>
       </Container>
