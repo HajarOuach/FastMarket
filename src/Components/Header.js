@@ -72,15 +72,18 @@ function Header({ user, onLogout }) {
           <Col xs={6} lg={2} className="d-flex justify-content-end gap-3 align-items-center">
             {/* Icône utilisateur avec menu */}
             <Dropdown show={showMenu} onToggle={() => setShowMenu(!showMenu)}>
-              <Dropdown.Toggle variant="light" className="border-0 bg-transparent p-0">
+              <Dropdown.Toggle variant="light" className="border-0 bg-transparent p-0 d-flex align-items-center gap-2">
                 <svg width="20" height="20" viewBox="0 0 24 24">
                   <path fill="currentColor" d="M12 12a5 5 0 1 0 0-10a5 5 0 0 0 0 10Zm0 2c-3.3 0-6 2.7-6 6h2a4 4 0 0 1 8 0h2c0-3.3-2.7-6-6-6Z" />
                 </svg>
+                {user?.prenom && (
+                  <span className="fw-semibold text-dark">{user.prenom}</span>
+                )}
               </Dropdown.Toggle>
               <Dropdown.Menu align="end">
                 {user ? (
                   <>
-                    <Dropdown.ItemText>Bonjour, {user.prenom}</Dropdown.ItemText>
+                    {/*<Dropdown.ItemText>Bonjour, {user.prenom} {user.nom}</Dropdown.ItemText>*/}
                     <Dropdown.Item onClick={handleLogout}>Se déconnecter</Dropdown.Item>
                   </>
                 ) : (

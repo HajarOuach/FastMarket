@@ -6,7 +6,7 @@ export default function Login({ onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const navigate = useNavigate(); // hook pour redirection
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,9 +26,15 @@ export default function Login({ onLogin }) {
       if (response.ok) {
         const client = await response.json();
 
-        // Stocker client et rediriger
+        // 🔍 Afficher les données reçues pour vérification
+        console.log("Données utilisateur reçues :", client);
+
+        // (Optionnel mais recommandé) : enlever le mot de passe de l'objet avant stockage
+        delete client.motDePasse;
+
+        // 💾 Stockage + appel fonction de connexion + redirection
         localStorage.setItem("client", JSON.stringify(client));
-        if (onLogin) onLogin(client); // si une fonction de connexion est passée
+        if (onLogin) onLogin(client);
         navigate("/accueil");
       } else if (response.status === 401) {
         setErrorMessage("Email ou mot de passe incorrect.");
