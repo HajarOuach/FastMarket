@@ -12,7 +12,7 @@ export default function Login({ onLogin }) {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://10.12.72.233:8080/clients/login", {
+      const response = await fetch("http://localhost:8080/utilisateurs/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

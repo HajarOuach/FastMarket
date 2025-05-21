@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
 import Header from './Components/Header';
@@ -14,45 +14,55 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 function App() {
   const [user, setUser] = useState(null);
 
+  // Charger l'utilisateur depuis localStorage au démarrage
+  useEffect(() => {
+    const storedUser = localStorage.getItem("client");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
   const handleLogin = (userData) => {
     setUser(userData);
   };
 
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={
-          !user ? (
-            <Login onLogin={handleLogin} />
-          ) : (
-            <Navigate to="/accueil" />
-          )
-        }
-      />
+    
+      <Routes>
+        <Route
+          path="/"
+          element={
+            !user ? (
+              <Login onLogin={handleLogin} />
+            ) : (
+              <Navigate to="/accueil" />
+            )
+          }
+        />
 
-      <Route
-        path="/accueil"
-        element={
-          user ? (
-            <>
-              <Header />
-              <HeroSection />
-              <BestSellers />
-              <Categories />
-              <BestSellings />
-            </>
-          ) : (
-            <Navigate to="/" />
-          )
-        }
-      />
+        <Route
+          path="/accueil"
+          element={
+            user ? (
+              <>
+                <Header />
+                <HeroSection />
+                <BestSellers />
+                <Categories />
+                <BestSellings />
+              </>
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
 
-      <Route
-        path="/catalogue"
-        element={user ? <Catalogue /> : <Navigate to="/" />}
-      />
-    </Routes>
+        <Route
+          path="/catalogue"
+          element={user ? <Catalogue /> : <Navigate to="/" />}
+        />
+      </Routes>
+    
   );
 }
 
