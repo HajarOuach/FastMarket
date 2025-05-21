@@ -14,7 +14,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 function App() {
   const [user, setUser] = useState(null);
 
-  // Charger l'utilisateur depuis localStorage au démarrage
   useEffect(() => {
     const storedUser = localStorage.getItem("client");
     if (storedUser) {
@@ -24,52 +23,39 @@ function App() {
 
   const handleLogin = (userData) => {
     setUser(userData);
+    localStorage.setItem("client", JSON.stringify(userData));
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem("client");
   };
 
   return (
     <Routes>
-      <Route
-        path="/"
-        element={
-          !user ? (
-            <Login onLogin={handleLogin} />
-          ) : (
-            <Navigate to="/accueil" />
-          )
-        }
-      />
+      <Route path="/" element={<Navigate to="/accueil" />} />
 
       <Route
         path="/accueil"
         element={
-          user ? (
-            <>
-              <Header />
-              <HeroSection />
-              <Categories />
-              <BestSellings />
-            </>
-          ) : (
-            <Navigate to="/" />
-          )
+          <>
+            <Header user={user} onLogout={handleLogout} />
+            <HeroSection />
+            <BestSellers />
+            <Categories />
+            <BestSellings />
+          </>
         }
       />
 
-      <Route
-        path="/catalogue"
-        element={
-          user ? (
-            <>
-              <Header />
-              <Catalogue />
-            </>
-          ) : (
-            <Navigate to="/" />
-          )
-        }
-      />
+      <Route path="/login" element={<Login onLogin={handleLogin} />} />
 
-      <Route
+        <Route
+          path="/catalogue"
+          element={user ? <Catalogue /> : <Navigate to="/" />}
+        />
+
+         <Route
         path="/panier"
         element={
           user ? (
@@ -81,9 +67,11 @@ function App() {
             <Navigate to="/" />
           )
         }
-      />
-    </Routes>
+        />
+      </Routes>
+    
   );
 }
 
 export default App;
+
