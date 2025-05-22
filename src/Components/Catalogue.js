@@ -104,4 +104,4 @@ const Catalogue = () => {
   );
 }
 
-export default catalogue;
+export default Catalogue;
