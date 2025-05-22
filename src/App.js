@@ -1,5 +1,9 @@
-import { useState } from 'react';
-import { Routes, Route, Link, Navigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { Routes, Route, Link, Navigate } from "react-router-dom";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
+
+
 
 import Header from './Components/Header';
 import HeroSection from './Components/HeroSection';
