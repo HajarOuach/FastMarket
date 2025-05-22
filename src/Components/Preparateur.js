@@ -46,8 +46,8 @@ const Preparateur = () => {
   const calculerTotal = (produits) =>
     produits
       .reduce((somme, p) => {
-        const prix = parseFloat(p.prix) || 5;
-        const quantite = parseInt(p.quantite) || 10;
+        const prix = parseFloat(p.prix) || 0;
+        const quantite = parseInt(p.quantite) || 0;
         return somme + prix * quantite;
       }, 0)
       .toFixed(2);

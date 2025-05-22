@@ -3,17 +3,17 @@ import { Routes, Route, Link, Navigate } from 'react-router-dom';
 
 import Header from './Components/Header';
 import HeroSection from './Components/HeroSection';
-import BestSellers from './Components/BestSellers';
 import Login from './Components/Login';
 import Catalogue from './Components/Catalogue';
 import Categories from './Components/Categories';
+import BestSellers from "./Components/PromotionsAccueil"
 import Preparateur from './Components/Preparateur';
 import ChoixMagasin from './Components/ChoixMagasin';
 import PageClient from './Components/PageClient';
 import PageGerant from './Components/PageGerant';
-import PagePreparateur from './Components/PagePreparateur';
 import BestSellings from './Components/BestSellings';
 import Panier from './Components/Panier';
+
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -81,21 +81,21 @@ function App() {
             )
           }
         />
-
+{/* 
         <Route
           path="/preparateur"
           element={
             user?.role === "preparateur" ? (
               <>
                 <Header user={user} onLogout={handleLogout} />
-                <PagePreparateur />
+                <Preparateur />
               </>
             ) : (
-              <Navigate to="/" />
+              <Navigate to="/preparateur" />
             )
           }
         />
-
+* */}
         <Route
           path="/gerant"
           element={
@@ -142,6 +142,13 @@ function App() {
           path="/choix-magasin"
           element={
             user ? <ChoixMagasin /> : <Navigate to="/" />
+          }
+        />
+        <Route path="/choix-magasin" element={<ChoixMagasin />} />
+        <Route
+          path="/preparateur"
+          element={
+            user ? <Preparateur /> : <Navigate to="/preparateur" />
           }
         />
       </Routes>
