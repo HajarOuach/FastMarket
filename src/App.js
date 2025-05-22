@@ -12,7 +12,7 @@ import Panier from './Components/Panier';
 
 import PageGerant from "./Components/PageGerant";
 import PagePreparateur from "./Components/PagePreparateur";
-import PageClient from "./Components/PageClient"; // page accueil client
+import PageClient from "./Components/PageClient"; // facultatif, si tu veux une autre page que HeroSection
 
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -38,12 +38,9 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/login" />} />
-
-      <Route path="/login" element={<Login onLogin={handleLogin} />} />
-
+      
       <Route
-        path="/accueil"
+        path="/"
         element={
           user?.role === "client" ? (
             <>
@@ -59,20 +56,25 @@ function App() {
         }
       />
 
+      {/* 🔐 Page de connexion */}
+      <Route path="/login" element={<Login onLogin={handleLogin} />} />
+
+      {/* 👤 Espace client redirigé après connexion */}
       <Route
-        path="/gerant"
+        path="/accueil"
         element={
-          user?.role === "gerant" ? (
+          user?.role === "client" ? (
             <>
               <Header user={user} onLogout={handleLogout} />
-              <PageGerant />
+              <PageClient />
             </>
           ) : (
-            <Navigate to="/login" />
+            <Navigate to="/" />
           )
         }
       />
 
+      {/* 👷‍♂️ Espace préparateur */}
       <Route
         path="/preparateur"
         element={
@@ -82,11 +84,27 @@ function App() {
               <PagePreparateur />
             </>
           ) : (
-            <Navigate to="/login" />
+            <Navigate to="/" />
           )
         }
       />
 
+      {/* 🧑‍💼 Espace gérant */}
+      <Route
+        path="/gerant"
+        element={
+          user?.role === "gerant" ? (
+            <>
+              <Header user={user} onLogout={handleLogout} />
+              <PageGerant />
+            </>
+          ) : (
+            <Navigate to="/" />
+          )
+        }
+      />
+
+      {/* 🛒 Catalogue visible uniquement après connexion */}
       <Route
         path="/catalogue"
         element={

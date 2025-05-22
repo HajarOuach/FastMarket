@@ -56,7 +56,7 @@ function Header({ user, onLogout }) {
           </Col>
 
           <Col lg={3} className="d-none d-lg-flex justify-content-center gap-3 fw-semibold text-uppercase small">
-            <Link to="/" className="text-dark text-decoration-none">Home</Link>
+            <Link to="/accueil" className="text-dark text-decoration-none">Home</Link>
             <div className="dropdown">
               <a className="text-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" href="#pages">
                 Pages

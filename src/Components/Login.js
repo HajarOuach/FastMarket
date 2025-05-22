@@ -39,7 +39,7 @@ export default function Login({ onLogin }) {
         // 🔁 Redirection selon le rôle de l'utilisateur
         switch (client.role) {
           case "client":
-            navigate("/accueil");
+            navigate("/");
             break;
           case "preparateur":
             navigate("/preparateur");
