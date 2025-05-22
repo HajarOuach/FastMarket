@@ -23,6 +23,9 @@
 
 .panier-article {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
   padding: 1.5rem;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -68,10 +71,15 @@
 }
 
 .article-sous-total {
-  font-size: 0.95rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  font-size: 1rem;
   font-weight: 500;
   color: #111;
-  margin-top: 4px;
+  min-width: 120px;
+  padding-left: 1rem;
 }
 
 .article-rupture {
@@ -121,7 +129,35 @@
   color: #B12704;
 }
 
+/* ✅ Bloc pour aligner quantité + sous-total */
+.quantite-et-soustotal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+  gap: 1rem;
+}
 
+.sous-total-inline-final {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #000;
+  min-width: 140px;
+  white-space: nowrap;
+  text-transform: lowercase;
+}
+
+.sous-total-label {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.sous-total-montant {
+  font-weight: 600;
+}
 
 .panier-total {
   font-weight: bold;
