@@ -39,6 +39,7 @@
   height: 150px;
   object-fit: contain;
   margin-right: 1.5rem;
+  background-color: #fdfdfd;
 }
 
 .article-infos {

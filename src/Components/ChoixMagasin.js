@@ -1,117 +1,124 @@
 import React, { useState } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate } from 'react-router-dom';
-import { Modal, Button, Alert } from 'react-bootstrap';
 
 const magasins = [
-  { id: 1, nom: 'Magasin A', adresse: '123 Rue de Paris' },
-  { id: 2, nom: 'Magasin B', adresse: '456 Avenue Lyon' },
-  { id: 3, nom: 'Magasin C', adresse: '789 Boulevard Marseille' },
+  { id: 1, nom: 'Magasin Paris', adresse: '123 Rue de Paris' },
+  { id: 2, nom: 'Magasin Lyon', adresse: '456 Avenue de Lyon' },
+  { id: 3, nom: 'Magasin Marseille', adresse: '789 Boulevard de Marseille' },
 ];
 
-const creneaux = [
-  '08:00 - 10:00',
-  '10:00 - 12:00',
-  '14:00 - 16:00',
-  '16:00 - 18:00',
+const creneauxHoraires = [
+  "06:00 - 06:30", "06:30 - 07:00", "07:00 - 07:30", "07:30 - 08:00",
+  "08:00 - 08:30", "08:30 - 09:00", "09:00 - 09:30", "09:30 - 10:00",
+  "10:00 - 10:30", "10:30 - 11:00", "11:00 - 11:30", "11:30 - 12:00",
+  "12:00 - 12:30", "12:30 - 13:00", "13:00 - 13:30", "13:30 - 14:00",
+  "14:00 - 14:30", "14:30 - 15:00", "15:00 - 15:30", "15:30 - 16:00",
+  "16:00 - 16:30", "16:30 - 17:00", "17:00 - 17:30", "17:30 - 18:00",
+  "18:00 - 18:30", "18:30 - 19:00", "19:00 - 19:30", "19:30 - 20:00",
+  "20:00 - 20:30", "20:30 - 21:00"
 ];
 
 const ChoixMagasin = () => {
-  const [magasinSelectionne, setMagasinSelectionne] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [creneauSelectionne, setCreneauSelectionne] = useState('');
-  const [confirmationVisible, setConfirmationVisible] = useState(false);
-
+  const [selectedMagasin, setSelectedMagasin] = useState(null);
+  const [confirmation, setConfirmation] = useState(false);
+  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedCreneau, setSelectedCreneau] = useState('');
   const navigate = useNavigate();
 
-  const handleMagasinClick = (magasin) => {
-    setMagasinSelectionne(magasin);
-    setShowModal(true);
+  const handleChoixMagasin = (magasin) => {
+    setSelectedMagasin(magasin);
+    setConfirmation(false);
+    setSelectedDate('');
+    setSelectedCreneau('');
   };
 
-  const handleConfirmMagasin = () => {
-    setShowModal(false);
-    setConfirmationVisible(false);
-    setCreneauSelectionne('');
+  const handleConfirmation = () => {
+    setConfirmation(true);
   };
 
   const handleCommander = () => {
     navigate('/catalogue');
   };
 
+  const today = new Date().toISOString().split('T')[0];
+
   return (
     <div className="container mt-5">
-      <h2>Choisissez votre magasin de retrait</h2>
+      <h2>Choisissez un magasin de retrait</h2>
       <div className="row">
         {magasins.map((magasin) => (
-          <div key={magasin.id} className="col-md-4 mb-3">
+          <div key={magasin.id} className="col-md-4">
             <div
-              className="card h-100"
-              style={{ cursor: 'pointer' }}
-              onClick={() => handleMagasinClick(magasin)}
+              className={`card mb-3 ${selectedMagasin?.id === magasin.id ? 'border-success' : ''}`}
             >
               <div className="card-body">
                 <h5 className="card-title">{magasin.nom}</h5>
                 <p className="card-text">{magasin.adresse}</p>
+                <button
+                  className="btn btn-primary"
+                  onClick={() => handleChoixMagasin(magasin)}
+                >
+                  Choisir
+                </button>
               </div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Choix du créneau */}
-      {magasinSelectionne && (
+      {selectedMagasin && (
         <>
-          <h4 className="mt-4">Créneaux disponibles pour {magasinSelectionne.nom}</h4>
-          <div className="d-flex flex-wrap gap-3 mt-3">
-            {creneaux.map((creneau) => (
-              <Button
-                key={creneau}
-                variant={creneau === creneauSelectionne ? 'success' : 'outline-success'}
-                onClick={() => {
-                  setCreneauSelectionne(creneau);
-                  setConfirmationVisible(true);
-                }}
-              >
-                {creneau}
-              </Button>
-            ))}
+          <div className="mt-4">
+            <h4>Choisir une date :</h4>
+            <input
+              type="date"
+              className="form-control"
+              value={selectedDate}
+              min={today}
+              onChange={(e) => {
+                setSelectedDate(e.target.value);
+                setSelectedCreneau('');
+              }}
+            />
           </div>
+
+          {selectedDate && (
+            <div className="mt-4">
+              <h4>Choisir un créneau horaire :</h4>
+              <select
+                className="form-select"
+                value={selectedCreneau}
+                onChange={(e) => setSelectedCreneau(e.target.value)}
+              >
+                <option value="">-- Sélectionner un créneau --</option>
+                {creneauxHoraires.map((c, index) => (
+                  <option key={index} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+          )}
         </>
       )}
 
-      {/* Confirmation message */}
-      {confirmationVisible && magasinSelectionne && creneauSelectionne && (
-        <Alert variant="success" className="mt-4">
-          Vous avez choisi le <strong>{magasinSelectionne.nom}</strong>, créneau : <strong>{creneauSelectionne}</strong>
-        </Alert>
-      )}
-
-      {/* Bouton Commander */}
-      {confirmationVisible && magasinSelectionne && creneauSelectionne && (
-        <div className="mt-3">
-          <Button variant="primary" onClick={handleCommander}>
-            Commander
-          </Button>
+      {selectedMagasin && selectedDate && selectedCreneau && !confirmation && (
+        <div className="mt-4">
+          <button className="btn btn-success" onClick={handleConfirmation}>
+            Confirmer
+          </button>
         </div>
       )}
 
-      {/* Modal confirmation */}
-      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Confirmation</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          Voulez-vous choisir <strong>{magasinSelectionne?.nom}</strong> comme point de retrait ?
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
-            Annuler
-          </Button>
-          <Button variant="primary" onClick={handleConfirmMagasin}>
-            Confirmer
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      {confirmation && (
+        <div className="mt-4 alert alert-success">
+          <p>✅ Vous avez choisi : <strong>{selectedMagasin.nom}</strong></p>
+          <p>📅 Date : <strong>{selectedDate}</strong></p>
+          <p>⏰ Créneau : <strong>{selectedCreneau}</strong></p>
+          <button className="btn btn-primary mt-3" onClick={handleCommander}>
+            Commander
+          </button>
+        </div>
+      )}
     </div>
   );
 };
