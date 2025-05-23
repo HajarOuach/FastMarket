@@ -1,14 +1,25 @@
+// src/Components/ChoixProfil.js
 import { useNavigate } from "react-router-dom";
+
 
 export default function ChoixProfil() {
   const navigate = useNavigate();
 
   const handleSelection = (role) => {
-    navigate(`/login?role=${role}`);
+    // redirection selon le rôle choisi
+    if (role === "client") navigate("/login?role=client");
+    else if (role === "preparateur") navigate("/login?role=preparateur");
+    else if (role === "gerant") navigate("/login?role=gerant");
   };
 
   return (
     <div className="container text-center mt-5">
+        <img
+              src="images/LogoMarket2 (2).png"
+              alt="FastMarket Logo"
+              className="img-fluid"
+              style={{ maxHeight: 80 }}
+            />
       <h2 className="mb-4">Bienvenue sur FastMarket</h2>
       <p className="lead mb-5">Veuillez choisir votre profil :</p>
 
