@@ -1,9 +1,9 @@
-// ✅ App.js — précharge les produits au démarrage et les passe à toutes les pages qui en ont besoin
 import { useEffect, useState } from "react";
 import { Routes, Route, Link, Navigate } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
+import ChoixProfil from './Components/ChoixProfil';
 import Header from './Components/Header';
 import HeroSection from './Components/HeroSection';
 import Login from './Components/Login';
@@ -20,7 +20,7 @@ import ListeProduits from './Components/ListeProduits';
 
 function App() {
   const [user, setUser] = useState(null);
-  const [produits, setProduits] = useState([]); // ✅ Produits globaux
+  const [produits, setProduits] = useState([]);
   const [produitsLoaded, setProduitsLoaded] = useState(false);
 
   useEffect(() => {
@@ -41,6 +41,7 @@ function App() {
 
   return (
     <>
+      {/* NavBar : optionnel de la cacher si user === null */}
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
         <div className="container">
           <Link className="navbar-brand" to="/">Accueil</Link>
@@ -59,19 +60,8 @@ function App() {
       </nav>
 
       <Routes>
-        <Route
-          path="/"
-          element={!user ? <Login onLogin={handleLogin} /> : user?.role === "client" ? (
-            <>
-              <Header user={user} onLogout={handleLogout} />
-              <HeroSection />
-              <BestSellers />
-              <Categories />
-              
-              
-            </>
-          ) : <Navigate to="/login" />}
-        />
+        {/* ✅ Page d’accueil → page de choix de profil */}
+        <Route path="/" element={<ChoixProfil />} />
 
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
 
@@ -96,6 +86,16 @@ function App() {
           </>
         ) : <Navigate to="/login" />} />
 
+        <Route path="/catalogue" element={
+  user ? (
+    <>
+      <Header user={user} onLogout={handleLogout} />
+      <ListeProduits produits={produits} produitsLoaded={produitsLoaded} />
+    </>
+  ) : <Navigate to="/login?role=client" />
+} />
+
+
         <Route path="/panier" element={user ? (
           <>
             <Header user={user} onLogout={handleLogout} />
@@ -115,7 +115,7 @@ function App() {
             <Header user={user} onLogout={handleLogout} />
             <Preparateur />
           </>
-        ) : <Navigate to="/preparateur" />} />
+        ) : <Navigate to="/login" />} />
 
         <Route path="/produits" element={user ? (
           <>

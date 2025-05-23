@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 export default function Login({ onLogin }) {
@@ -7,9 +7,15 @@ export default function Login({ onLogin }) {
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // ✅ Lire le rôle attendu depuis l'URL
+  
+  const expectedRole = new URLSearchParams(location.search).get("role");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage("");
 
     try {
       const response = await fetch("http://localhost:8080/utilisateurs/login", {
@@ -24,17 +30,22 @@ export default function Login({ onLogin }) {
       });
 
       if (response.ok) {
-        const client = await response.json();
-        console.log("Données utilisateur reçues :", client);
+        const user = await response.json();
+        delete user.motDePasse;
 
-        delete client.motDePasse;
+        // ❌ Refuser la connexion si le rôle ne correspond pas
+        if (user.role !== expectedRole) {
+          setErrorMessage(`Ce compte est un ${user.role}. Veuillez utiliser la page de connexion dédiée.`);
+          return;
+        }
 
-        localStorage.setItem("client", JSON.stringify(client));
-        if (onLogin) onLogin(client);
+        // ✅ Connexion valide
+        localStorage.setItem("client", JSON.stringify(user));
+        if (onLogin) onLogin(user);
 
-        switch (client.role) {
+        switch (user.role) {
           case "client":
-            navigate("/"); // ✅ page publique d'accueil
+            navigate("/"); // ✅ Page d’accueil publique
             break;
           case "preparateur":
             navigate("/preparateur");
@@ -43,7 +54,7 @@ export default function Login({ onLogin }) {
             navigate("/gerant");
             break;
           default:
-            navigate("/login");
+            navigate("/");
         }
       } else if (response.status === 401) {
         setErrorMessage("Email ou mot de passe incorrect.");
@@ -56,10 +67,24 @@ export default function Login({ onLogin }) {
     }
   };
 
+  // ✅ Continuer en tant que visiteur
+  const handleVisiteur = () => {
+    const visiteur = {
+      nom: "Visiteur",
+      role: expectedRole,
+    };
+    localStorage.setItem("client", JSON.stringify(visiteur));
+    if (onLogin) onLogin(visiteur);
+    navigate("/choix-magasin");
+  };
+
   return (
     <div className="container d-flex justify-content-center align-items-center min-vh-100">
       <div className="row border rounded-5 p-3 bg-white shadow box-area" style={{ width: "400px" }}>
-        <h3 className="text-center mb-4">Connexion</h3>
+        <h3 className="text-center mb-4">
+          Connexion {expectedRole ? `(${expectedRole})` : ""}
+        </h3>
+
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label className="form-label">Adresse Email</label>
@@ -91,12 +116,18 @@ export default function Login({ onLogin }) {
             </div>
           )}
 
-          <div className="d-grid">
+          <div className="d-grid mb-2">
             <button type="submit" className="btn btn-primary">
               Se connecter
             </button>
           </div>
         </form>
+
+        <div className="d-grid">
+          <button onClick={handleVisiteur} className="btn btn-outline-secondary">
+            Continuer en tant que visiteur
+          </button>
+        </div>
       </div>
     </div>
   );
