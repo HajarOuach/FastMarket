@@ -10,7 +10,7 @@ export default function Login({ onLogin }) {
   const location = useLocation();
 
   // ✅ Lire le rôle attendu depuis l'URL
-  
+
   const expectedRole = new URLSearchParams(location.search).get("role");
 
   const handleSubmit = async (e) => {
@@ -45,7 +45,7 @@ export default function Login({ onLogin }) {
 
         switch (user.role) {
           case "client":
-            navigate("/"); // ✅ Page d’accueil publique
+            navigate("/accueil"); // ✅ Page d’accueil publique
             break;
           case "preparateur":
             navigate("/preparateur");
@@ -91,7 +91,7 @@ export default function Login({ onLogin }) {
             <input
               type="email"
               className="form-control"
-              placeholder="test@mail.com"
+              placeholder="Entrez votre email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -103,7 +103,7 @@ export default function Login({ onLogin }) {
             <input
               type="password"
               className="form-control"
-              placeholder="1234"
+              placeholder="Mot de passe"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
