@@ -40,7 +40,7 @@ function App() {
 
   return (
     <>
-      {/* NavBar affichée uniquement si utilisateur connecté */}
+      {/* NavBar affichée uniquement si utilisateur connecté 
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
         <div className="container">
           <Link className="navbar-brand" to="/">Accueil</Link>
@@ -56,7 +56,7 @@ function App() {
             )}
           </div>
         </div>
-      </nav>
+      </nav>*/}
 
       <Routes>
         {/* Page d’accueil de démarrage : Choix du profil */}
