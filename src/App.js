@@ -67,8 +67,8 @@ function App() {
               <HeroSection />
               <BestSellers />
               <Categories />
-              <BestSellings />
-              <ListeProduits produits={produits} produitsLoaded={produitsLoaded} /> {/* ✅ Affichage directement */}
+              
+              
             </>
           ) : <Navigate to="/login" />}
         />

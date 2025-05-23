@@ -1,24 +1,10 @@
-import { useEffect, useState } from "react";
+// ✅ ListeProduits.js mis à jour pour recevoir les produits depuis App.js via props
+import { useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 
-export default function ListeProduits() {
-  const [produits, setProduits] = useState([]);
-  const [loading, setLoading] = useState(true);
+export default function ListeProduits({ produits, produitsLoaded }) {
   const [selectedProduit, setSelectedProduit] = useState(null);
   const [quantities, setQuantities] = useState({});
-
-  useEffect(() => {
-    fetch("http://localhost:8080/produits")
-      .then((res) => res.json())
-      .then((data) => {
-        setProduits(Array.isArray(data) ? data : []);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("❌ Erreur :", err);
-        setLoading(false);
-      });
-  }, []);
 
   const handleDetail = (produit) => setSelectedProduit(produit);
   const handleClose = () => setSelectedProduit(null);
@@ -35,7 +21,7 @@ export default function ListeProduits() {
     <div className="container mt-5">
       <h2 className="text-center mb-4">Nos produits disponibles</h2>
 
-      {loading ? (
+      {!produitsLoaded ? (
         <div className="row">
           {Array.from({ length: 6 }).map((_, index) => (
             <div key={index} className="col-md-3 mb-3">
