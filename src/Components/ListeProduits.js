@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { Modal, Button } from "react-bootstrap";
 
 export default function ListeProduits() {
@@ -9,9 +8,10 @@ export default function ListeProduits() {
   const [quantities, setQuantities] = useState({});
 
   useEffect(() => {
-    axios.get("http://localhost:8080/produits")
-      .then((res) => {
-        setProduits(Array.isArray(res.data) ? res.data : []);
+    fetch("http://localhost:8080/produits")
+      .then((res) => res.json())
+      .then((data) => {
+        setProduits(Array.isArray(data) ? data : []);
         setLoading(false);
       })
       .catch((err) => {
@@ -36,7 +36,25 @@ export default function ListeProduits() {
       <h2 className="text-center mb-4">Nos produits disponibles</h2>
 
       {loading ? (
-        <p className="text-center">Chargement en cours...</p>
+        <div className="row">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <div key={index} className="col-md-3 mb-3">
+              <div
+                className="card border-0 shadow-sm p-2"
+                style={{ backgroundColor: "#f5f5f5", height: "250px" }}
+              >
+                <div
+                  className="placeholder-glow"
+                  style={{ height: "140px", background: "#ddd", borderRadius: "12px" }}
+                />
+                <div className="mt-2">
+                  <div className="placeholder col-8 mb-1" style={{ background: "#ccc", height: "12px" }} />
+                  <div className="placeholder col-6" style={{ background: "#ccc", height: "12px" }} />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       ) : (
         <div className="row">
           {produits
@@ -45,19 +63,13 @@ export default function ListeProduits() {
               <div key={produit.id} className="col-md-3 mb-3">
                 <div
                   className="card border-0 shadow-sm text-center p-2 position-relative"
-                  style={{
-                    minHeight: "auto",
-                    height: "100%",
-                    backgroundColor: "#ffffff",
-                  }}
+                  style={{ backgroundColor: "#ffffff" }}
                 >
-                  {/* ✅ Bloc image avec fond blanc solide sous l'image transparente */}
                   <div
                     style={{
                       backgroundColor: "#fff",
                       padding: "10px",
                       borderRadius: "12px",
-                      overflow: "hidden",
                       height: "140px",
                       display: "flex",
                       alignItems: "center",
