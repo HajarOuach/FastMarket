@@ -17,7 +17,7 @@ function Panier() {
       prix: 0.8,
       image: '/images/Fruits.jpeg',
       quantite: 2,
-      enStock: true,
+      enStock: false,
     },
   ]);
 

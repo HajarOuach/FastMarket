@@ -102,6 +102,6 @@ const Catalogue = () => {
       )}
     </div>
   );
-};
+}
 
 export default Catalogue;

@@ -25,21 +25,16 @@ export default function Login({ onLogin }) {
 
       if (response.ok) {
         const client = await response.json();
-
-        // 🔍 Afficher les données reçues pour vérification
         console.log("Données utilisateur reçues :", client);
 
-        // 🧹 Enlever le mot de passe avant stockage
         delete client.motDePasse;
 
-        // 💾 Stockage + appel fonction de connexion
         localStorage.setItem("client", JSON.stringify(client));
         if (onLogin) onLogin(client);
 
-        // 🔁 Redirection selon le rôle de l'utilisateur
         switch (client.role) {
           case "client":
-            navigate("/");
+            navigate("/"); // ✅ page publique d'accueil
             break;
           case "preparateur":
             navigate("/preparateur");
@@ -48,9 +43,8 @@ export default function Login({ onLogin }) {
             navigate("/gerant");
             break;
           default:
-            navigate("/login"); // sécurité
+            navigate("/login");
         }
-
       } else if (response.status === 401) {
         setErrorMessage("Email ou mot de passe incorrect.");
       } else {
