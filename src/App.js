@@ -110,7 +110,7 @@ function App() {
         {/* Choix du magasin */}
         <Route path="/choix-magasin" element={user ? (
           <>
-            <Header user={user} onLogout={handleLogout} />
+            
             <ChoixMagasin />
           </>
         ) : <Navigate to="/" />} />
