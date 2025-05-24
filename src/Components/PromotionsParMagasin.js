@@ -5,86 +5,88 @@ const PromotionsParMagasin = ({ magasinId }) => {
     1: [
       {
         title: "Articles en promotions",
-        description: "Réductions jusqu'à 30%",
-        image: "/images/banner-1.jpg",
+        description: "Jusqu'à -40% sur les boissons",
+        image: "/images/bois.jpg",
       },
       {
         title: "Offres combinées",
         description: "1 acheté = 2 offerts",
-        image: "/images/barbec.jpeg",
+        image: "/images/cereales.jpg",
       },
       {
         title: "Bonnes affaires",
-        description: "Jusqu'à -40% sur les boissons",
-        image: "/images/promos/mag3_promo1.jpg",
+        description: "Réductions jusqu'à 30%",
+        image: "/images/dessert.jpg",
       },
     ],
     2: [
       {
         title: "Articles en promotions",
-        description: "20% sur les dattes et fruits secs",
-        image: "/images/banner-1.jpg",
+        description: "10% sur les viandes",
+        image: "/images/viande.jpg",
       },
       {
         title: "Offres combinées",
-        description: "Réductions jusqu'à 50%",
-        image: "/images/barbec.jpeg",
+        description: "2 acheté = 1 offert",
+        image: "/images/snacks.jpg",
       },
       {
         title: "Bons de réduction",
-        description: "Jusqu'à -40% sur les boissons",
-        image: "/images/promos/mag3_promo1.jpg",
+        description: "Jusqu'à -40% ",
+        image: "/images/cady.jpg",
       },
     ],
     3: [
-      {
-        title: "Offres combinées",
-        description: "Jusqu'à -40% sur les boissons",
-        image: "/images/drink.jpeg",
-      },
-      {
+       {
         title: "Articles en promotions",
         description: "Réductions jusqu'à 30%",
-        image: "/images/banner-1.jpg",
+        image: "/images/barbec.jpeg",
       },
       {
-        title: "Bons de réduction",
-        description: "Jusqu'à -40% sur les boissons",
+        title: "Offres combinées",
+        description: "2 acheté = 1 offert",
         image: "/images/banner-1.jpg",
       },
+     
+      {
+        title: "Bons de réduction",
+        description: "Jusqu'à -50% sur les produits d'ygène",
+        image: "/images/hyg.jpeg",
+      }
     ],
     4: [
       {
-        title: "Offres combinées",
-        description: "Jusqu'à -40% sur les boissons",
-        image: "/images/promos/mag3_promo1.jpg",
-      },
-      {
         title: "Articles en promotions",
         description: "Réductions jusqu'à 30%",
-        image: "/images/banner-1.jpg",
+        image: "/images/lait.jpg",
       },
+      {
+        title: "Offres combinées",
+        description:  "2 acheté = 1 offert",
+        image: "/images/promo_glace.jpg",
+      },
+      
       {
         title: "Bons de réduction",
         description: "Jusqu'à -40% sur les boissons",
-        image: "/images/promos/mag3_promo1.jpg",
+        image: "/images/menage.jpg",
       },
     ],
     5: [
       {
         title: "Offres combinées",
         description: "Jusqu'à -40% sur les boissons",
-        image: "/images/promos/mag3_promo1.jpg",
+        image: "/images/fr1.jpg",
       },
       {
         title: "Articles en promotions",
         description: "Réductions jusqu'à 30%",
-        image: "/images/banner-1.jpg",
+        image: "/images/Cereals.jpeg",
       },
       {
         title: "Bons de réduction",
         description: "Jusqu'à -40% sur les boissons",
-        image: "/images/promos/mag3_promo1.jpg",
+        image: "/images/LG.jpg",
       },
     ],
   };
