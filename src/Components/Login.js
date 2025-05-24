@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 export default function Login({ onLogin }) {
@@ -13,7 +13,6 @@ export default function Login({ onLogin }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMessage("");
 
     try {
       const response = await fetch("http://localhost:8080/utilisateurs/login", {
@@ -101,7 +100,7 @@ export default function Login({ onLogin }) {
             <input
               type="email"
               className="form-control"
-              placeholder="Entrez votre email"
+              placeholder="test@mail.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -113,7 +112,7 @@ export default function Login({ onLogin }) {
             <input
               type="password"
               className="form-control"
-              placeholder="Mot de passe"
+              placeholder="1234"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -128,12 +127,6 @@ export default function Login({ onLogin }) {
             <button type="submit" className="btn btn-primary">Se connecter</button>
           </div>
         </form>
-
-        <div className="d-grid">
-          <button onClick={handleVisiteur} className="btn btn-outline-secondary">
-            Continuer en tant que visiteur
-          </button>
-        </div>
       </div>
     </div>
   );

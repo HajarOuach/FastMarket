@@ -21,6 +21,8 @@ const ChoixMagasin = () => {
   }, []);
 
   const handleChoixMagasin = (magasin) => {
+    if (!magasin) return;
+    console.log("Magasin sélectionné :", magasin);
     setSelectedMagasin(magasin);
     setConfirmation(false);
     setSelectedDate('');
@@ -33,7 +35,15 @@ const ChoixMagasin = () => {
   };
 
   const handleConfirmation = () => setConfirmation(true);
-  const handleCommander = () => navigate('/accueil');
+
+  const handleCommander = () => {
+    if (!selectedMagasin) {
+      console.error("Aucun magasin sélectionné !");
+      return;
+    }
+    localStorage.setItem("magasin", JSON.stringify(selectedMagasin));
+    navigate(`/accueil-magasin/${selectedMagasin.id}`);
+  };
 
   const handleChangerMagasin = () => {
     setSelectedMagasin(null);
@@ -42,21 +52,21 @@ const ChoixMagasin = () => {
     setConfirmation(false);
   };
 
-  const handleConfirmMagasin = () => {
-    setShowModal(false);
-    // Tu peux ajouter une logique ici si besoin
-  };
+  const handleConfirmMagasin = () => setShowModal(false);
 
   const today = new Date().toISOString().split('T')[0];
-  const magasinsToShow = selectedMagasin ? [selectedMagasin] : magasins;
 
-  const creneauxDisponibles = selectedMagasin?.creneaux
-    ?.sort((a, b) => a.heureDebut.localeCompare(b.heureDebut))
-    .map(c => {
-      const debut = c.heureDebut.substring(0, 5);
-      const fin = c.heureFin.substring(0, 5);
-      return `${debut} - ${fin}`;
-    }) || [];
+  const magasinsToShow = Array.isArray(magasins)
+    ? (selectedMagasin ? [selectedMagasin] : magasins)
+    : [];
+
+  const creneauxDisponibles = selectedMagasin?.creneaux?.length
+    ? selectedMagasin.creneaux.sort((a, b) => a.heureDebut.localeCompare(b.heureDebut)).map(c => {
+        const debut = c.heureDebut.substring(0, 5);
+        const fin = c.heureFin.substring(0, 5);
+        return `${debut} - ${fin}`;
+      })
+    : [];
 
   return (
     <div className="container mt-5">
@@ -194,4 +204,3 @@ const ChoixMagasin = () => {
 };
 
 export default ChoixMagasin;
-//commentaire
