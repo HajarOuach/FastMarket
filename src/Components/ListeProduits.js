@@ -220,7 +220,7 @@ export default function ListeProduits({ produits, produitsLoaded }) {
           </Modal.Footer>
         </Modal>
       )}
-      )}
+      
 
       {selectedProduit && (
         <Modal show onHide={handleClose} centered>
