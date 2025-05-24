@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Container, Row, Col, Form, FormControl, Dropdown } from 'react-bootstrap';
 
-function Header({ user, onLogout }) {
+function Header({ onLogout }) {
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false);
 
+  // 🔸 On récupère l'utilisateur connecté depuis localStorage
+  const user = JSON.parse(localStorage.getItem("client"));
   const isVisiteur = user?.nom === "Visiteur";
   const hasMagasin = user?.magasin || localStorage.getItem("magasin");
   const canAccessHome = !isVisiteur && !!hasMagasin;
@@ -45,7 +47,7 @@ function Header({ user, onLogout }) {
             </Link>
           </Col>
 
-          {/* Barre de recherche sans menu Catégories */}
+          {/* Barre de recherche */}
           <Col xs={12} lg={5}>
             <Form className="d-flex bg-light rounded-pill px-3 py-2 shadow-sm align-items-center">
               <FormControl
