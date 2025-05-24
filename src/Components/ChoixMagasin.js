@@ -194,3 +194,4 @@ const ChoixMagasin = () => {
 };
 
 export default ChoixMagasin;
+//commentaire
