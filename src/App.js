@@ -11,11 +11,11 @@ import HeroSection from './Components/HeroSection';
 import Login from './Components/Login';
 import Catalogue from './Components/Catalogue';
 import Categories from './Components/Categories';
-import BestSellers from "./Components/PromotionsAccueil";
+
 import Preparateur from './Components/Preparateur';
 import ChoixMagasin from './Components/ChoixMagasin';
 import PageGerant from './Components/PageGerant';
-import BestSellings from './Components/BestSellings';
+
 import Panier from './Components/Panier';
 import ListeProduits from './Components/ListeProduits';
 
@@ -65,7 +65,8 @@ function App() {
             <>
               <Header user={user} onLogout={handleLogout} />
               <HeroSection />
-              <BestSellers />
+              {/* <BestSellers />*/}
+             
               <Categories />
             </>
           ) : <Navigate to="/login" />

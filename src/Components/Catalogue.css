@@ -1,0 +1,65 @@
+/* 🧾 Import de polices sobres et lisibles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Nunito:wght@500&display=swap');
+
+/* 🎯 Titre principal : sobre et propre */
+h1, h2 {
+  font-family: 'Inter', sans-serif;
+  font-size: 2rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 30px;
+}
+
+/* ✅ Nom des catégories : police propre, sans décalage */
+.card-title {
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+/* 📦 Carte de catégorie */
+.category-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 16px;
+  overflow: hidden;
+  border: none;
+  background: white;
+  padding-bottom: 15px;
+}
+
+.category-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.category-img {
+  height: 180px;
+  object-fit: cover;
+  border-bottom: 1px solid #eee;
+}
+
+/* 🟡 Bouton Voir les produits : plus petit et discret */
+.btn-voir {
+  background-color: #f9c200;
+  color: #1a1a1a;
+  border: none;
+  border-radius: 22px;
+  padding: 5px 16px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 0.85rem;
+  margin-top: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+}
+
+.btn-voir:hover {
+  background-color: #e0ad00;
+  color: white;
+  transform: scale(1.03);
+}
