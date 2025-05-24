@@ -4,7 +4,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import AccueilMagasin from "./Components/AccueilMagasin";
 
-
 import ChoixProfil from './Components/ChoixProfil';
 import Header from './Components/Header';
 import HeroSection from './Components/HeroSection';
@@ -46,7 +45,6 @@ function App() {
   return (
     <>
       <Routes>
-        {/* Page de démarrage : Choix du profil uniquement si non connecté */}
         <Route path="/" element={
           user ? (
             user.role === "client" ? <Navigate to="/login" /> :
@@ -56,76 +54,65 @@ function App() {
           ) : <ChoixProfil />
         } />
 
-        {/* Page de login */}
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
 
-        {/* Accueil classique du client */}
         <Route path="/accueil" element={
           user?.role === "client" ? (
             <>
-              <Header user={user} onLogout={handleLogout} />
+              <Header onLogout={handleLogout} />
               <HeroSection />
-              {/* <BestSellers />*/}
-             
               <Categories />
             </>
           ) : <Navigate to="/login" />
         } />
 
-        {/* Accueil du client selon magasin sélectionné (visiteur ou client) */}
-       <Route path="/accueil-magasin/:id" element={<AccueilMagasin />} />
+        <Route path="/accueil-magasin/:id" element={<AccueilMagasin />} />
 
-        {/* Page du gérant */}
         <Route path="/gerant" element={
           user?.role === "gerant" ? (
             <>
-              <Header user={user} onLogout={handleLogout} />
+              <Header onLogout={handleLogout} />
               <PageGerant />
             </>
           ) : <Navigate to="/login" />
         } />
 
-        {/* Page du préparateur */}
         <Route path="/preparateur" element={
           user?.role === "preparateur" ? (
             <>
-              <Header user={user} onLogout={handleLogout} />
+              <Header onLogout={handleLogout} />
               <Preparateur />
             </>
           ) : <Navigate to="/login" />
         } />
 
-        {/* Catalogue accessible aux rôles connectés */}
         <Route path="/catalogue" element={
           user ? (
             <>
-              <Header user={user} onLogout={handleLogout} />
+              <Header onLogout={handleLogout} />
               <Catalogue />
             </>
           ) : <Navigate to="/login" />
         } />
 
-        {/* Liste de tous les produits */}
         <Route path="/produits" element={
           user ? (
             <>
-              <Header user={user} onLogout={handleLogout} />
+              <Header onLogout={handleLogout} />
               <ListeProduits produits={produits} produitsLoaded={produitsLoaded} />
             </>
           ) : <Navigate to="/login" />
         } />
 
-        {/* Panier */}
         <Route path="/panier" element={
           user ? (
             <>
-              <Header user={user} onLogout={handleLogout} />
+              <Header onLogout={handleLogout} />
               <Panier />
             </>
           ) : <Navigate to="/login" />
         } />
 
-        {/* Choix du magasin */}
         <Route path="/choix-magasin" element={<ChoixMagasin />} />
       </Routes>
     </>
