@@ -48,7 +48,7 @@ function App() {
         {/* Page de démarrage : Choix du profil uniquement si non connecté */}
         <Route path="/" element={
           user ? (
-            user.role === "client" ? <Navigate to="/accueil" /> :
+            user.role === "client" ? <Navigate to="/login" /> :
             user.role === "gerant" ? <Navigate to="/gerant" /> :
             user.role === "preparateur" ? <Navigate to="/preparateur" /> :
             <Navigate to="/login" />
@@ -67,7 +67,7 @@ function App() {
               <BestSellers />
               <Categories />
             </>
-          ) : <Navigate to="/login" />
+          ) : <Navigate to="/accueil" />
         } />
 
         {/* Accueil du client selon magasin sélectionné (visiteur ou client) */}
