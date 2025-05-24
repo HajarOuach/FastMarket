@@ -4,6 +4,7 @@ import HeroSection from "./HeroSection";
 import Categories from "./Categories";
 import PromotionsParMagasin from "./PromotionsParMagasin"; 
 import Header from './Header';
+import BestSellings from './BestSellings';
 
 
 
@@ -26,7 +27,9 @@ const AccueilMagasin = () => {
     <div className="container">
         <HeroSection nomMagasin={magasin.nom} />
       <PromotionsParMagasin magasinId={id} />
-      <Categories />
+      
+<BestSellings magasinId={id} />
+
     </div>
   </>
 );

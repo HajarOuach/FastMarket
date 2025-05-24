@@ -1,79 +1,188 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { Button, Modal } from "react-bootstrap";
 
-function BestSellings() {
+const BestSellings = ({ magasinId }) => {
+  const [produits, setProduits] = useState([]);
+  const [selectedProduit, setSelectedProduit] = useState(null);
+  const [quantities, setQuantities] = useState({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!magasinId) return;
+
+    axios
+      .get(`http://localhost:8080/produits/magasin/${magasinId}`)
+      .then((res) => {
+        const enPromo = res.data.filter((p) => p.enPromotion);
+        setProduits(enPromo.slice(0, 6));
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Erreur chargement produits :", err);
+        setLoading(false);
+      });
+  }, [magasinId]);
+
+  const handleDetail = (produit) => setSelectedProduit(produit);
+  const handleClose = () => setSelectedProduit(null);
+
+  const increaseQuantity = (id) =>
+    setQuantities((prev) => ({ ...prev, [id]: (prev[id] || 1) + 1 }));
+
+  const decreaseQuantity = (id) =>
+    setQuantities((prev) => ({
+      ...prev,
+      [id]: Math.max(1, (prev[id] || 1) - 1),
+    }));
+
+  if (loading || !produits.length) return null;
+
   return (
-    <section className="pb-5">
-      <div className="container-lg">
-        <div className="row mb-4">
-          <div className="col-12 d-flex justify-content-between align-items-center flex-wrap">
-            <h2 className="fw-bold fs-3 mb-2 mb-md-0">Produits les plus vendus</h2>
-            <a href="#" className="btn btn-warning text-dark fw-semibold rounded-2 px-3 py-2">
-              Voir tout
-            </a>
-          </div>
-        </div>
-
-        <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
-          {[1, 2, 3, 4, 5, 6, 7].map((id) => (
-            <div className="col" key={id}>
-              <div className="card h-100 border-0 shadow-sm rounded-3">
-                <a href="#" className="d-block p-3 pb-0">
-                  <img
-                    src={`images/product-thumb-${id}.png`}
-                    alt={`Product ${id}`}
-                    className="img-fluid rounded-3"
-                    style={{ height: '160px', objectFit: 'contain' }}
-                  />
-                </a>
-                <div className="card-body text-center pt-2">
-                  <h5 className="fs-6 fw-bold mb-1">Nom du produit {id}</h5>
-                  <div className="mb-2">
-                    <span className="rating me-1">
-                      {[...Array(4)].map((_, i) => (
-                        <svg key={i} width="16" height="16" className="text-warning">
-                          <use xlinkHref="#star-full" />
-                        </svg>
-                      ))}
-                      <svg width="16" height="16" className="text-warning">
-                        <use xlinkHref="#star-half" />
-                      </svg>
-                    </span>
-                    <small className="text-muted">(222)</small>
-                  </div>
-                  <div className="mb-2">
-                    <del className="text-muted me-1">$24.00</del>
-                    <span className="fw-bold text-dark">$18.00</span>
-                    <span className="badge bg-light text-dark border ms-2">10% OFF</span>
-                  </div>
-
-                  <div className="d-flex align-items-center justify-content-center gap-2 mt-3">
-                    <input
-                      type="number"
-                      name="quantity"
-                      className="form-control form-control-sm w-25 text-center"
-                      defaultValue={1}
-                      min={1}
-                    />
-                    <button className="btn btn-sm btn-warning text-dark fw-bold">
-                      <svg width="16" height="16" className="me-1">
-                        <use xlinkHref="#cart" />
-                      </svg>
-                      Ajouter
-                    </button>
-                    <button className="btn btn-sm btn-outline-secondary">
-                      <svg width="16" height="16">
-                        <use xlinkHref="#heart" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
+    <div className="container mt-5">
+      <h3 className="text-center mb-4">Meilleures ventes pour vous</h3>
+      <div className="row">
+        {produits.map((produit) => (
+          <div key={produit.id} className="col-md-4 mb-4">
+            <div className="card border-0 shadow-sm text-center p-2 position-relative">
+              <div
+                style={{
+                  backgroundColor: "#fff",
+                  padding: "10px",
+                  borderRadius: "12px",
+                  height: "140px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  position: "relative",
+                }}
+              >
+                <img
+                  src={produit.image}
+                  alt={produit.libelle}
+                  style={{
+                    maxHeight: "100%",
+                    maxWidth: "100%",
+                    objectFit: "contain",
+                    zIndex: 1,
+                    position: "relative",
+                  }}
+                />
               </div>
+
+              <h6 className="fw-bold text-dark mt-2" style={{ fontSize: "1rem" }}>
+                {produit.libelle}
+              </h6>
+              <div className="fw-bold text-dark mb-2" style={{ fontSize: "1.1rem" }}>
+                {produit.prixUnitaire.toFixed(2)} €
+              </div>
+
+              <div className="d-flex justify-content-center align-items-center mb-2 gap-2">
+                <button
+                  className="btn btn-warning btn-sm px-2 py-1"
+                  onClick={() => decreaseQuantity(produit.id)}
+                >
+                  –
+                </button>
+                <span style={{ minWidth: "20px" }}>
+                  {quantities[produit.id] || 1}
+                </span>
+                <button
+                  className="btn btn-warning btn-sm px-2 py-1"
+                  onClick={() => increaseQuantity(produit.id)}
+                >
+                  +
+                </button>
+              </div>
+
+              <div className="d-flex justify-content-center gap-2 mt-1">
+                <button
+                  className="btn px-2 py-1 rounded-pill d-flex align-items-center gap-1"
+                  style={{
+                    fontSize: "0.8rem",
+                    backgroundColor: "#3cb371",
+                    color: "#fff",
+                    border: "none",
+                  }}
+                >
+                  <i className="bi bi-cart-plus" style={{ fontSize: "0.9rem" }}></i> Ajouter
+                </button>
+
+                <button
+                  className="btn btn-outline-secondary px-2 py-1 rounded-pill d-flex align-items-center gap-1"
+                  style={{ fontSize: "0.8rem" }}
+                  onClick={() => handleDetail(produit)}
+                >
+                  <i className="bi bi-info-circle" style={{ fontSize: "0.9rem" }}></i> Détail
+                </button>
+              </div>
+
+              {produit.typePromotion && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "10px",
+                    right: "10px",
+                    backgroundColor: "#28a745",
+                    color: "#fff",
+                    fontSize: "0.7rem",
+                    fontWeight: "bold",
+                    padding: "3px 10px",
+                    borderRadius: "50px",
+                    whiteSpace: "nowrap",
+                    zIndex: 10,
+                  }}
+                >
+                  {produit.typePromotion}
+                </div>
+              )}
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
-    </section>
+
+      {selectedProduit && (
+        <Modal show onHide={handleClose} centered>
+          <Modal.Header closeButton>
+            <Modal.Title>{selectedProduit.libelle}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body className="text-center">
+            <img
+              src={selectedProduit.image}
+              alt={selectedProduit.libelle}
+              className="img-fluid mb-3"
+              style={{
+                maxHeight: "200px",
+                objectFit: "contain",
+                position: "relative",
+                zIndex: 1,
+              }}
+            />
+            <p>
+              <strong>Prix :</strong> {selectedProduit.prixUnitaire.toFixed(2)} €
+              <br />
+              {selectedProduit.marque && (
+                <>
+                  <strong>Marque :</strong> {selectedProduit.marque}
+                  <br />
+                </>
+              )}
+              {selectedProduit.enPromotion && selectedProduit.typePromotion && (
+                <>
+                  <strong>Promotion :</strong> {selectedProduit.typePromotion}
+                </>
+              )}
+            </p>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleClose}>
+              Fermer
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      )}
+    </div>
   );
-}
+};
 
 export default BestSellings;
