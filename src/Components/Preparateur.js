@@ -1,115 +1,158 @@
-import React, { useState, useEffect } from 'react';
-import './Preparateur.css';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
-const Preparateur = () => {
+export default function GestionCommandes() {
   const [commandes, setCommandes] = useState([]);
+  const [commandeActive, setCommandeActive] = useState(null);
 
   useEffect(() => {
-    // ✅ Données simulées corrigées avec prix pour tous les produits
-    const commandesSimulees = [
-      {
-        id: 102,
-        user: { nom: 'Dupont', prenom: 'Alice' },
-        produits: [
-          { nom: 'Produit A', quantite: 2, prix: 10 },
-          { nom: 'Produit B', quantite: 1, prix: 15 }
-        ],
-        date: '2025-05-22T13:04:00',
-        etat: 'En attente'
-      },
-      {
-        id: 35,
-        user: { nom: 'Martin', prenom: 'Jean' },
-        produits: [
-          { nom: 'Produit C', quantite: 5, prix: 7 }
-        ],
-        date: '2025-05-22T12:45:00',
-        etat: 'En attente'
-      }
-    ];
-    setCommandes(commandesSimulees);
+    axios
+      .get("http://localhost:8080/commandes/preparateur/32/commandes/commandees")
+      .then((res) => setCommandes(res.data))
+      .catch((err) => console.error("Erreur lors du chargement :", err));
   }, []);
 
-  const toggleEtatCommande = (id) => {
-    setCommandes((prev) =>
-      prev.map((commande) =>
-        commande.id === id
-          ? {
-              ...commande,
-              etat: commande.etat === 'Traitée' ? 'En attente' : 'Traitée'
-            }
+  const changerStatut = (commandeId, nouveauStatut) => {
+    setCommandes((prevCommandes) =>
+      prevCommandes.map((commande) =>
+        commande.id === commandeId
+          ? { ...commande, statut: nouveauStatut }
           : commande
       )
     );
   };
 
-  const calculerTotal = (produits) =>
-    produits
-      .reduce((somme, p) => {
-        const prix = parseFloat(p.prix) || 0;
-        const quantite = parseInt(p.quantite) || 0;
-        return somme + prix * quantite;
-      }, 0)
-      .toFixed(2);
+  const formatHeure = (timeStr) => timeStr?.substring(0, 5);
 
   return (
-    <div className="p-4 bg-dark text-white min-vh-100">
-      <h1 className="mb-4">Gestion des commandes</h1>
+    <div className="container">
+      <h1 className="title">Commandes à Préparer</h1>
 
-      <table className="table table-dark table-hover align-middle">
-        <thead>
-          <tr>
-            <th>N°</th>
-            <th>Utilisateur</th>
-            <th>Détails</th>
-            <th>Total (€)</th>
-            <th>Date</th>
-            <th>Heure</th>
-            <th>État</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {commandes.map((commande) => {
-            const dateObj = new Date(commande.date);
-            const dateStr = dateObj.toLocaleDateString();
-            const heureStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            const total = calculerTotal(commande.produits);
+      <div className="commandes-list">
+        {commandes.map((commande) => (
+          <div key={commande.id} className="commande-card">
+            <h2>Commande #{commande.id}</h2>
+            <p><strong>Client :</strong> {commande.client?.nom}</p>
+            <p><strong>Date :</strong> {new Date(commande.dateCommande).toLocaleString()}</p>
+            <p><strong>Créneau :</strong> {formatHeure(commande.creneau?.heureDebut)} - {formatHeure(commande.creneau?.heureFin)}</p>
+            <p><strong>Statut :</strong> {commande.statut}</p>
 
-            return (
-              <tr key={commande.id}>
-                <td>#{commande.id}</td>
-                <td>{commande.user.prenom} {commande.user.nom}</td>
-                <td>
-                  <ul className="mb-0">
-                    {commande.produits.map((p, i) => (
-                      <li key={i}>{p.nom} × {p.quantite}</li>
-                    ))}
-                  </ul>
-                </td>
-                <td>{total} €</td>
-                <td>{dateStr}</td>
-                <td>{heureStr}</td>
-                <td>
-                  <span className={`badge ${commande.etat === 'Traitée' ? 'bg-success' : 'bg-warning text-dark'}`}>
-                    {commande.etat}
-                  </span>
-                </td>
-                <td>
-                  <button
-                    className={`btn btn-sm ${commande.etat === 'Traitée' ? 'btn-secondary' : 'btn-primary'}`}
-                    onClick={() => toggleEtatCommande(commande.id)}
-                  >
-                    {commande.etat === 'Traitée' ? 'Annuler' : 'Traiter'}
-                  </button>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+            <div className="actions">
+              {commande.statut === "Commandé" && (
+                <button onClick={() => changerStatut(commande.id, "En préparation")} className="btn yellow">Traiter</button>
+              )}
+              {commande.statut === "En préparation" && (
+                <button onClick={() => changerStatut(commande.id, "Terminé")} className="btn green">Terminer</button>
+              )}
+              <button onClick={() => setCommandeActive(commande)} className="btn blue">Détails</button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Détails commande */}
+      {commandeActive && (
+        <div className="popup-overlay" onClick={() => setCommandeActive(null)}>
+          <div className="popup" onClick={(e) => e.stopPropagation()}>
+            <h3>Détails de la commande #{commandeActive.id}</h3>
+            <ul>
+              {commandeActive.lignesCommande.map((ligne) => (
+                <li key={ligne.id}>
+                  {ligne.produit?.libelle} – <strong>{ligne.quantite}</strong>
+                </li>
+              ))}
+            </ul>
+            <button onClick={() => setCommandeActive(null)} className="btn red">Fermer</button>
+          </div>
+        </div>
+      )}
+
+      {/* STYLES */}
+      <style jsx>{`
+        .container {
+          padding: 2rem;
+        }
+
+        .title {
+          font-size: 2rem;
+          font-weight: bold;
+          margin-bottom: 2rem;
+        }
+
+        .commandes-list {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+          gap: 1.5rem;
+        }
+
+        .commande-card {
+          background: #fff;
+          border: 1px solid #ccc;
+          border-radius: 12px;
+          padding: 1rem;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .actions {
+          margin-top: 1rem;
+          display: flex;
+          gap: 0.5rem;
+          flex-wrap: wrap;
+        }
+
+        .btn {
+          padding: 0.5rem 1rem;
+          border-radius: 6px;
+          border: none;
+          cursor: pointer;
+          color: white;
+          font-weight: bold;
+        }
+
+        .btn.yellow {
+          background-color: #facc15;
+        }
+
+        .btn.green {
+          background-color: #22c55e;
+        }
+
+        .btn.blue {
+          background-color: #3b82f6;
+        }
+
+        .btn.red {
+          background-color: #ef4444;
+        }
+
+        .popup-overlay {
+          position: fixed;
+          top: 0; left: 0;
+          width: 100%; height: 100%;
+          background-color: rgba(0, 0, 0, 0.6);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .popup {
+          background: white;
+          padding: 2rem;
+          border-radius: 12px;
+          max-width: 400px;
+          width: 100%;
+        }
+
+        .popup ul {
+          margin-top: 1rem;
+          list-style: none;
+          padding: 0;
+        }
+
+        .popup li {
+          margin-bottom: 0.5rem;
+        }
+      `}</style>
     </div>
   );
-};
-
-export default Preparateur;
+}
