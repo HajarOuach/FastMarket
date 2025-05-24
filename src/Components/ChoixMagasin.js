@@ -1,97 +1,173 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate } from 'react-router-dom';
-import { Button, Modal, Alert } from 'react-bootstrap';
-
-const magasins = [
-  { id: 1, nom: 'Magasin Paris', adresse: '123 Rue de Paris' },
-  { id: 2, nom: 'Magasin Lyon', adresse: '456 Avenue de Lyon' },
-  { id: 3, nom: 'Magasin Marseille', adresse: '789 Boulevard de Marseille' },
-];
-
-const creneaux = ['08:00 - 10:00', '10:00 - 12:00', '14:00 - 16:00', '16:00 - 18:00'];
+import axios from 'axios';
 
 const ChoixMagasin = () => {
+  const [magasins, setMagasins] = useState([]);
   const [selectedMagasin, setSelectedMagasin] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [confirmationVisible, setConfirmationVisible] = useState(false);
   const [creneauSelectionne, setCreneauSelectionne] = useState('');
   const navigate = useNavigate();
+  const dateCreneauRef = useRef(null);
+
+  useEffect(() => {
+    axios.get("http://localhost:8080/magasins/top5")
+      .then(response => setMagasins(response.data))
+      .catch(error => console.error("Erreur lors du chargement des magasins :", error));
+  }, []);
 
   const handleChoixMagasin = (magasin) => {
     setSelectedMagasin(magasin);
-    setShowModal(true);
-    setConfirmationVisible(false);
-    setCreneauSelectionne('');
+    setConfirmation(false);
+    setSelectedDate('');
+    setSelectedCreneau('');
+    setTimeout(() => {
+      if (dateCreneauRef.current) {
+        dateCreneauRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
   };
 
-  const handleConfirmMagasin = () => {
-    localStorage.setItem("magasin", selectedMagasin.nom);
-    setShowModal(false);
+  const handleConfirmation = () => setConfirmation(true);
+  const handleCommander = () => navigate('/accueil');
+
+  const handleChangerMagasin = () => {
+    setSelectedMagasin(null);
+    setSelectedDate('');
+    setSelectedCreneau('');
+    setConfirmation(false);
   };
 
-  const handleCommander = () => {
-    navigate('/catalogue');
-  };
+  const today = new Date().toISOString().split('T')[0];
+  const magasinsToShow = selectedMagasin ? [selectedMagasin] : magasins;
+
+  const creneauxDisponibles = selectedMagasin?.creneaux
+    ?.sort((a, b) => a.heureDebut.localeCompare(b.heureDebut))
+    .map(c => {
+      const debut = c.heureDebut.substring(0, 5);
+      const fin = c.heureFin.substring(0, 5);
+      return `${debut} - ${fin}`;
+    }) || [];
 
   return (
-    <div className="container text-center mt-5">
-      <img src="/images/LogoMarket2 (2).png" alt="FastMarket Logo" className="mb-4" style={{ maxHeight: 100 }} />
-      <h2 className="mb-4">Choisissez votre magasin de retrait</h2>
+    <div className="container mt-5">
+      <div className="text-center mb-5">
+        <img src="/images/LogoMarket2 (2).png" alt="FastMarket Logo" style={{ maxHeight: 120 }} className="mb-3" />
+        <h1 className="fw-bold mb-3">Choisissez un magasin de retrait</h1>
+        <p className="text-muted fs-5">Sélectionnez votre magasin, la date et le créneau pour votre retrait</p>
+      </div>
 
-      <div className="row justify-content-center">
-        {magasins.map((magasin) => (
-          <div key={magasin.id} className="col-12 col-md-4 mb-3">
-            <div className="card shadow-sm h-100" style={{ cursor: 'pointer' }}>
-              <div className="card-body">
-                <h5 className="card-title">{magasin.nom}</h5>
-                <p className="card-text">{magasin.adresse}</p>
-                <button
-                  className="btn btn-primary"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleChoixMagasin(magasin);
-                  }}
-                >
-                  Choisir
-                </button>
+      <div className="row justify-content-center mb-4">
+        {magasinsToShow.map((magasin) => {
+          const isSelected = selectedMagasin?.id === magasin.id;
+          return (
+            <div key={magasin.id} className="col-md-4 mb-4 position-relative">
+              <div className={`card shadow-sm h-100 ${isSelected ? 'border border-3 border-success' : ''}`}>
+                <div className="position-absolute top-0 end-0 m-2">
+                  <div
+                    onClick={() => handleChoixMagasin(magasin)}
+                    role="button"
+                    aria-label={isSelected ? 'Sélectionné' : 'Choisir'}
+                    style={{
+                      width: '24px',
+                      height: '24px',
+                      borderRadius: '50%',
+                      border: `2px solid ${isSelected ? '#198754' : '#0d6efd'}`,
+                      backgroundColor: isSelected ? '#198754' : 'transparent',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {isSelected && (
+                      <div style={{
+                        width: '10px',
+                        height: '10px',
+                        borderRadius: '50%',
+                        backgroundColor: 'white',
+                      }} />
+                    )}
+                  </div>
+                </div>
+                <div className="card-body d-flex flex-column justify-content-between">
+                  <div>
+                    <h5 className="card-title">{magasin.nom}</h5>
+                    <p className="card-text text-secondary">{magasin.adresse}</p>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {selectedMagasin && (
-        <>
-          <h4 className="mt-5">Créneaux disponibles pour <strong>{selectedMagasin.nom}</strong></h4>
-          <div className="d-flex flex-wrap gap-3 justify-content-center mt-3">
-            {creneaux.map((creneau) => (
-              <Button
-                key={creneau}
-                variant={creneau === creneauSelectionne ? 'success' : 'outline-success'}
-                onClick={() => {
-                  setCreneauSelectionne(creneau);
-                  setConfirmationVisible(true);
-                }}
-              >
-                {creneau}
-              </Button>
-            ))}
+        <div className="card shadow p-4 mb-5" ref={dateCreneauRef}>
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <h4 className="mb-0">Réservation pour <strong>{selectedMagasin.nom}</strong></h4>
+            <button className="btn btn-outline-secondary btn-sm" onClick={handleChangerMagasin}>
+              ← Changer de magasin
+            </button>
           </div>
-        </>
-      )}
 
-      {confirmationVisible && selectedMagasin && (
-        <>
-          <Alert variant="success" className="mt-4">
-            Vous avez choisi <strong>{selectedMagasin.nom}</strong> – créneau : <strong>{creneauSelectionne}</strong>
-          </Alert>
-          <div className="mt-3">
-            <Button variant="primary" onClick={handleCommander}>
-              Commander
-            </Button>
+          <div className="mb-4">
+            <label htmlFor="date" className="form-label fw-semibold">Choisir une date</label>
+            <input
+              id="date"
+              type="date"
+              className="form-control"
+              value={selectedDate}
+              min={today}
+              onChange={(e) => {
+                setSelectedDate(e.target.value);
+                setSelectedCreneau('');
+              }}
+            />
           </div>
-        </>
+
+          {selectedDate && (
+            <>
+              <label htmlFor="creneau" className="form-label fw-semibold">Choisir un créneau horaire</label>
+              {creneauxDisponibles.length > 0 ? (
+                <select
+                  id="creneau"
+                  className="form-select"
+                  value={selectedCreneau}
+                  onChange={(e) => setSelectedCreneau(e.target.value)}
+                >
+                  <option value="">-- Sélectionner un créneau --</option>
+                  {creneauxDisponibles.map((c, i) => (
+                    <option key={i} value={c}>{c}</option>
+                  ))}
+                </select>
+              ) : (
+                <p className="text-danger fst-italic">Aucun créneau disponible pour ce magasin.</p>
+              )}
+            </>
+          )}
+
+          {selectedDate && selectedCreneau && !confirmation && (
+            <div className="mt-4 text-end">
+              <button className="btn btn-success px-4" onClick={handleConfirmation}>
+                Confirmer
+              </button>
+            </div>
+          )}
+
+          {confirmation && (
+            <div className="alert alert-success mt-4 text-center">
+              <p className="mb-1">✅ Vous avez choisi : <strong>{selectedMagasin.nom}</strong></p>
+              <p className="mb-1">📅 Date : <strong>{selectedDate}</strong></p>
+              <p>⏰ Créneau : <strong>{selectedCreneau}</strong></p>
+              <button className="btn btn-primary mt-3" onClick={handleCommander}>
+                Commander
+              </button>
+            </div>
+          )}
+        </div>
       )}
 
       <Modal show={showModal} onHide={() => setShowModal(false)} centered>

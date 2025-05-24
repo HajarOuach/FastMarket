@@ -55,6 +55,17 @@ export default function ListeProduits({ produits, produitsLoaded }) {
                     position: "relative",
                   }}
                 >
+                  <div
+                    style={{
+                      backgroundColor: "#fff",
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      zIndex: 0,
+                    }}
+                  />
                   <img
                     src={produit.image}
                     alt={produit.libelle}
@@ -72,9 +83,7 @@ export default function ListeProduits({ produits, produitsLoaded }) {
                   {produit.libelle}
                 </h6>
                 <div className="fw-bold mb-1" style={{ color: "#000", fontSize: "1rem" }}>
-                  {produit.prixUnitaire != null
-                    ? `${produit.prixUnitaire.toFixed(2)} €`
-                    : "Prix indisponible"}
+                  {produit.prixUnitaire.toFixed(2)} €
                 </div>
 
                 <div className="d-flex justify-content-center align-items-center mt-1 mb-1 gap-2">
@@ -148,19 +157,40 @@ export default function ListeProduits({ produits, produitsLoaded }) {
             <Modal.Title>{selectedProduit.libelle}</Modal.Title>
           </Modal.Header>
           <Modal.Body className="text-center">
-            <div style={{ backgroundColor: "#fff", borderRadius: "10px", padding: "10px" }}>
+            <div
+              style={{
+                backgroundColor: "#fff",
+                borderRadius: "10px",
+                padding: "10px",
+                display: "inline-block",
+                position: "relative",
+              }}
+            >
+              <div
+                style={{
+                  backgroundColor: "#fff",
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  zIndex: 0,
+                }}
+              />
               <img
                 src={selectedProduit.image}
                 alt={selectedProduit.libelle}
                 className="img-fluid"
-                style={{ maxHeight: "200px", objectFit: "contain" }}
+                style={{
+                  maxHeight: "200px",
+                  objectFit: "contain",
+                  position: "relative",
+                  zIndex: 1,
+                }}
               />
             </div>
             <p className="mt-3">
-              <strong>Prix :</strong>{" "}
-              {selectedProduit.prixUnitaire != null
-                ? `${selectedProduit.prixUnitaire.toFixed(2)} €`
-                : "Indisponible"}
+              <strong>Prix :</strong> {selectedProduit.prixUnitaire.toFixed(2)} €
               <br />
               {selectedProduit.marque && (
                 <>
