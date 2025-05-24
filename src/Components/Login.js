@@ -63,9 +63,15 @@ export default function Login({ onLogin }) {
       localStorage.setItem("client", JSON.stringify(userWithId));
       if (onLogin) onLogin(userWithId);
 
+      // ✅ Redirection correcte vers /accueil-magasin/{id}
       switch (utilisateur.role) {
         case "client":
-          navigate("/accueil");
+          const magasinId = details.magasin?.id;
+          if (magasinId) {
+            navigate(`/accueil-magasin/${magasinId}`);
+          } else {
+            navigate("/accueil-magasin");
+          }
           break;
         case "preparateur":
           navigate("/preparateur");
@@ -76,27 +82,24 @@ export default function Login({ onLogin }) {
         default:
           navigate("/");
       }
-
     } catch (error) {
       console.error("Erreur lors de la connexion :", error);
+      setErrorMessage("Erreur réseau ou serveur.");
       setErrorMessage("Erreur réseau ou serveur.");
     }
   };
 
-  // ✅ Continuer en tant que visiteur
-    const handleVisiteur = () => {
-      const visiteur = {
-        nom: "Visiteur",
-        role: expectedRole,
-      };
-      localStorage.setItem("client", JSON.stringify(visiteur));
-      if (onLogin) onLogin(visiteur);
-      navigate("/choix-magasin");
-    };
+  const handleVisiteur = () => {
+    const visiteur = { nom: "Visiteur", role: expectedRole };
+    localStorage.setItem("client", JSON.stringify(visiteur));
+    if (onLogin) onLogin(visiteur);
+    navigate("/choix-magasin");
+  };
 
   return (
     <div className="container d-flex justify-content-center align-items-center min-vh-100">
       <div className="row border rounded-5 p-3 bg-white shadow box-area" style={{ width: "400px" }}>
+        <h3 className="text-center mb-4">Connexion {expectedRole ? `(${expectedRole})` : ""}</h3>
         <h3 className="text-center mb-4">Connexion {expectedRole ? `(${expectedRole})` : ""}</h3>
 
         <form onSubmit={handleSubmit}>
@@ -124,11 +127,10 @@ export default function Login({ onLogin }) {
             />
           </div>
 
-          {errorMessage && (
-            <div className="alert alert-danger">{errorMessage}</div>
-          )}
+          {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
 
           <div className="d-grid mb-2">
+            <button type="submit" className="btn btn-primary">Se connecter</button>
             <button type="submit" className="btn btn-primary">Se connecter</button>
           </div>
         </form>
