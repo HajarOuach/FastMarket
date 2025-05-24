@@ -2,13 +2,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { Modal, Button } from 'react-bootstrap';
 
 const ChoixMagasin = () => {
   const [magasins, setMagasins] = useState([]);
   const [selectedMagasin, setSelectedMagasin] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [confirmationVisible, setConfirmationVisible] = useState(false);
-  const [creneauSelectionne, setCreneauSelectionne] = useState('');
+  const [confirmation, setConfirmation] = useState(false);
+  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedCreneau, setSelectedCreneau] = useState('');
   const navigate = useNavigate();
   const dateCreneauRef = useRef(null);
 
@@ -38,6 +40,11 @@ const ChoixMagasin = () => {
     setSelectedDate('');
     setSelectedCreneau('');
     setConfirmation(false);
+  };
+
+  const handleConfirmMagasin = () => {
+    setShowModal(false);
+    // Tu peux ajouter une logique ici si besoin
   };
 
   const today = new Date().toISOString().split('T')[0];
@@ -187,3 +194,4 @@ const ChoixMagasin = () => {
 };
 
 export default ChoixMagasin;
+//commentaire
