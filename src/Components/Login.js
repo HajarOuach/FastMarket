@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 export default function Login({ onLogin }) {
@@ -13,6 +13,7 @@ export default function Login({ onLogin }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage("");
 
     try {
       const response = await fetch("http://localhost:8080/utilisateurs/login", {
@@ -82,12 +83,16 @@ export default function Login({ onLogin }) {
     }
   };
 
-  const handleVisiteur = () => {
-    const visiteur = { nom: "Visiteur", role: expectedRole };
-    localStorage.setItem("client", JSON.stringify(visiteur));
-    if (onLogin) onLogin(visiteur);
-    navigate("/choix-magasin");
-  };
+  // ✅ Continuer en tant que visiteur
+    const handleVisiteur = () => {
+      const visiteur = {
+        nom: "Visiteur",
+        role: expectedRole,
+      };
+      localStorage.setItem("client", JSON.stringify(visiteur));
+      if (onLogin) onLogin(visiteur);
+      navigate("/choix-magasin");
+    };
 
   return (
     <div className="container d-flex justify-content-center align-items-center min-vh-100">
@@ -100,7 +105,7 @@ export default function Login({ onLogin }) {
             <input
               type="email"
               className="form-control"
-              placeholder="test@mail.com"
+              placeholder="Entrez votre email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -112,7 +117,7 @@ export default function Login({ onLogin }) {
             <input
               type="password"
               className="form-control"
-              placeholder="1234"
+              placeholder="Mot de passe"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -127,6 +132,12 @@ export default function Login({ onLogin }) {
             <button type="submit" className="btn btn-primary">Se connecter</button>
           </div>
         </form>
+
+        <div className="d-grid">
+          <button onClick={handleVisiteur} className="btn btn-outline-secondary">
+            Continuer en tant que visiteur
+          </button>
+        </div>
       </div>
     </div>
   );
