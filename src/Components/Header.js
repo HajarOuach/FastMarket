@@ -57,7 +57,9 @@ function Header({ user, onLogout }) {
               Home
             </Link>
 
-            <Link to="/" className="text-dark text-decoration-none">Produits</Link>
+            <Link to="/produits" className="text-dark text-decoration-none">Produits</Link>
+
+
 
             <Link to="/catalogue" className="text-dark text-decoration-none">Catégories</Link>
           </Col>

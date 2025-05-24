@@ -40,7 +40,7 @@ function App() {
 
   return (
     <>
-      {/* NavBar affichée uniquement si utilisateur connecté 
+      {/* NavBar affichée uniquement si utilisateur connecté  TEST
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
         <div className="container">
           <Link className="navbar-brand" to="/">Accueil</Link>
@@ -110,7 +110,7 @@ function App() {
         {/* Choix du magasin */}
         <Route path="/choix-magasin" element={user ? (
           <>
-            <Header user={user} onLogout={handleLogout} />
+            
             <ChoixMagasin />
           </>
         ) : <Navigate to="/" />} />
