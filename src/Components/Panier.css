@@ -39,7 +39,6 @@
   height: 150px;
   object-fit: contain;
   margin-right: 1.5rem;
-  background-color: #fdfdfd;
 }
 
 .article-infos {
@@ -71,44 +70,18 @@
   font-size: 1.2rem;
 }
 
-.article-sous-total {
+.quantite-et-soustotal {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: center;
-  font-size: 1rem;
-  font-weight: 500;
-  color: #111;
-  min-width: 120px;
-  padding-left: 1rem;
-}
-
-.article-rupture {
-  opacity: 0.5;
-  pointer-events: none;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+  gap: 1rem;
 }
 
 .quantite-controle {
-  margin-top: 0.5rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-}
-
-.quantite-btn {
-  background-color: #f0c14b;
-  border: 1px solid #a88734;
-  color: #111;
-  padding: 0.3rem 0.6rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-}
-
-.quantite-btn:disabled {
-  background-color: #ddd;
-  color: #888;
-  cursor: not-allowed;
 }
 
 .quantite {
@@ -128,15 +101,6 @@
 
 .btn-supprimer:hover {
   color: #B12704;
-}
-
-/* ✅ Bloc pour aligner quantité + sous-total */
-.quantite-et-soustotal {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 0.5rem;
-  gap: 1rem;
 }
 
 .sous-total-inline-final {
@@ -165,4 +129,11 @@
   font-size: 1.3rem;
   margin-top: 1.5rem;
   text-align: right;
+}
+
+.panier-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+  gap: 1rem;
 }

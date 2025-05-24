@@ -1,54 +1,71 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './Panier.css';
 
 function Panier() {
-  const [articles, setArticles] = useState([
-    {
-      id: 1,
-      nom: 'Lait Bio',
-      prix: 1.5,
-      image: '/images/Bio.jpeg',
-      quantite: 1,
-      enStock: true,
-    },
-    {
-      id: 2,
-      nom: 'Pomme',
-      prix: 0.8,
-      image: '/images/Fruits.jpeg',
-      quantite: 2,
-      enStock: false,
-    },
-  ]);
+  const [articles, setArticles] = useState([]);
+  const client = JSON.parse(localStorage.getItem("client"));
+  const clientId = client?.id;
 
-  const incrementer = (id) => {
-    setArticles(prev =>
-      prev.map(article =>
-        article.id === id
-          ? { ...article, quantite: article.quantite + 1 }
-          : article
-      )
-    );
+  useEffect(() => {
+    if (clientId) {
+      fetch(`http://localhost:8080/panier/${clientId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.lignesCommande) {
+            const articles = data.lignesCommande.map((ligne) => ({
+              idLigne: ligne.id,
+              nom: ligne.produit.libelle,
+              prix: ligne.produit.prixUnitaire,
+              quantite: ligne.quantite,
+              image: ligne.produit.image,
+              enStock: true,
+            }));
+            setArticles(articles);
+          }
+        })
+        .catch((err) => console.error("Erreur chargement panier :", err));
+    }
+  }, [clientId]);
+
+  const retirerArticle = (ligneId) => {
+    fetch(`http://localhost:8080/panier/ligne/${ligneId}`, {
+      method: "DELETE",
+    })
+      .then(() => {
+        setArticles((prev) => prev.filter((a) => a.idLigne !== ligneId));
+      })
+      .catch((err) => console.error("Erreur suppression article :", err));
   };
 
-  const decrementer = (id) => {
-    setArticles(prev =>
-      prev
-        .map(article =>
-          article.id === id
-            ? { ...article, quantite: article.quantite - 1 }
-            : article
-        )
-        .filter(article => article.quantite > 0)
-    );
+  const viderPanier = () => {
+    if (clientId) {
+      fetch(`http://localhost:8080/panier/${clientId}/vider`, {
+        method: "DELETE",
+      })
+        .then(() => setArticles([]))
+        .catch((err) => console.error("Erreur vidage panier :", err));
+    }
   };
 
-  const retirerArticle = (id) => {
-    setArticles(prev => prev.filter(article => article.id !== id));
+  const validerCommande = () => {
+    if (clientId) {
+      fetch(`http://localhost:8080/panier/valider/${clientId}`, {
+        method: "PUT",
+      })
+        .then((res) => {
+          if (res.ok) {
+            alert("Commande validée avec succès !");
+            setArticles([]);
+          } else {
+            alert("Erreur lors de la validation.");
+          }
+        })
+        .catch(() => alert("Erreur serveur lors de la validation."));
+    }
   };
 
   const total = articles
-    .filter(article => article.enStock)
+    .filter((article) => article.enStock)
     .reduce((sum, article) => sum + article.prix * article.quantite, 0);
 
   return (
@@ -60,7 +77,10 @@ function Panier() {
       ) : (
         <>
           {articles.map((article) => (
-            <div className={`panier-article ${!article.enStock ? 'article-rupture' : ''}`} key={article.id}>
+            <div
+              className={`panier-article ${!article.enStock ? 'article-rupture' : ''}`}
+              key={article.idLigne}
+            >
               <img src={article.image} alt={article.nom} className="article-image" />
 
               <div className="article-infos">
@@ -76,10 +96,8 @@ function Panier() {
 
                 <div className="quantite-et-soustotal">
                   <div className="quantite-controle">
-                    <button onClick={() => decrementer(article.id)} className="quantite-btn" disabled={!article.enStock}>−</button>
                     <span className="quantite">{article.quantite}</span>
-                    <button onClick={() => incrementer(article.id)} className="quantite-btn" disabled={!article.enStock}>+</button>
-                    <button onClick={() => retirerArticle(article.id)} className="btn-supprimer">🗑</button>
+                    <button onClick={() => retirerArticle(article.idLigne)} className="btn-supprimer">🗑</button>
                   </div>
 
                   {article.enStock && article.quantite > 0 && (
@@ -96,6 +114,11 @@ function Panier() {
           ))}
 
           <div className="panier-total">Total : {total.toFixed(2)} €</div>
+
+          <div className="panier-actions">
+            <button onClick={viderPanier} className="btn btn-danger me-2">Vider le panier</button>
+            <button onClick={validerCommande} className="btn btn-success">Valider la commande</button>
+          </div>
         </>
       )}
     </div>
