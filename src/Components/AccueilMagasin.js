@@ -1,36 +1,35 @@
-import { useParams } from 'react-router-dom';
-import PromotionsParMagasin from './PromotionsParMagasin';
-import ListeProduits from './ListeProduits';
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import HeroSection from "./HeroSection";
+import Categories from "./Categories";
+import PromotionsParMagasin from "./PromotionsParMagasin"; 
+import Header from './Header';
 
-export default function AccueilMagasin() {
-  const { id } = useParams();
-  const magasinId = parseInt(id);
-  const [produits, setProduits] = useState([]);
-  const [produitsLoaded, setProduitsLoaded] = useState(false);
+
+
+const AccueilMagasin = () => {
+  const { id } = useParams(); // récupère l'id du magasin depuis l'URL
+  const [magasin, setMagasin] = useState(null);
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:8080/produits/magasin/${magasinId}`)
-      .then((res) => {
-        setProduits(res.data);
-        setProduitsLoaded(true);
-      })
-      .catch((err) => {
-        console.error("Erreur chargement produits :", err);
-        setProduits([]);
-        setProduitsLoaded(true);
-      });
-  }, [magasinId]);
+    fetch(`http://localhost:8080/magasins/${id}`)
+      .then((res) => res.json())
+      .then((data) => setMagasin(data))
+      .catch((err) => console.error("Erreur :", err));
+  }, [id]);
 
-  return (
-    <>
-      <PromotionsParMagasin magasinId={magasinId} />
-      <div className="container mt-5">
-        <h2 className="text-center mb-4">Produits disponibles dans ce magasin</h2>
-        <ListeProduits produits={produits} produitsLoaded={produitsLoaded} />
-      </div>
-    </>
-  );
-}
+  if (!magasin) return <p className="text-center">Chargement du magasin...</p>;
+
+ return (
+  <>
+    <Header />  {/* ✅ Affiche le Header */}
+    <div className="container">
+        <HeroSection nomMagasin={magasin.nom} />
+      <PromotionsParMagasin magasinId={id} />
+      <Categories />
+    </div>
+  </>
+);
+};
+
+export default AccueilMagasin;

@@ -42,7 +42,8 @@ const ChoixMagasin = () => {
       return;
     }
     localStorage.setItem("magasin", JSON.stringify(selectedMagasin));
-    navigate(`/accueil-magasin/${selectedMagasin.id}`);
+  navigate(`/accueil-magasin/${selectedMagasin.id}`);
+
   };
 
   const handleChangerMagasin = () => {

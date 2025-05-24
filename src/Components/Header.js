@@ -13,6 +13,7 @@ function Header({ user, onLogout }) {
   const handleLogout = () => {
     if (onLogout) onLogout();
     setShowMenu(false);
+    navigate('/');
   };
 
   const handleLoginClick = () => {

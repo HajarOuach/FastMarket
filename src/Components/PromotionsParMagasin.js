@@ -7,30 +7,90 @@ const PromotionsParMagasin = ({ magasinId }) => {
       {
         title: "Articles en promotions",
         description: "Réductions jusqu'à 30%",
-        image: "/images/images/banner-1.jpg",
+        image: "/images/banner-1.jpg",
+       
       },
       {
         title: "Offres combinées",
-        description: "Réductions jusqu'à 50%",
-        image: "/images/images/banner-1.jpg",
+        description: "1 achté = 2 offert",
+        image: "/images/barbec.jpeg", 
+        
       },
-    ],
-    2: [
-      {
-        title: "Spécial Ramadan",
-        description: "20% sur les dattes et fruits secs",
-        image: "/images//images/banner-1.jpg",
-      },
-    ],
-    3: [
       {
         title: "Bonnes affaires",
         description: "Jusqu'à -40% sur les boissons",
         image: "/images/promos/mag3_promo1.jpg",
       },
     ],
-    4: [],
-    5: [],
+    2: [
+      {
+        title: "Articles en promotions",
+        description: "20% sur les dattes et fruits secs",
+        image: "/images/banner-1.jpg",
+        image: "/images/barbec.jpeg",
+      },
+      {
+        title: "Offres combinées",
+        description: "Réductions jusqu'à 50%",
+        image: "/images/banner-1.jpg",
+      },
+      {
+        title: "Bons de réduction",
+        description: "Jusqu'à -40% sur les boissons",
+        image: "/images/promos/mag3_promo1.jpg",
+      },
+    ],
+    3: [
+      {
+        title:"Offres combinées",
+        description: "Jusqu'à -40% sur les boissons",
+        image: "/images/drink.jpeg",
+      },
+      {
+        title: "Articles en promotions",
+        description: "Réductions jusqu'à 30%",
+        image: "/images/banner-1.jpg",
+      },
+      {
+        title: "Bons de réduction",
+        description: "Jusqu'à -40% sur les boissons",
+        image: "/images/banner-1.jpg",
+      },
+    ],
+    4:  [
+      {
+        title:"Offres combinées",
+        description: "Jusqu'à -40% sur les boissons",
+        image: "/images/promos/mag3_promo1.jpg",
+      },
+      {
+        title: "Articles en promotions",
+        description: "Réductions jusqu'à 30%",
+        image: "/images/banner-1.jpg",
+      },
+      {
+        title: "Bons de réduction",
+        description: "Jusqu'à -40% sur les boissons",
+        image: "/images/promos/mag3_promo1.jpg",
+      },
+    ],
+    5: [
+      {
+        title:"Offres combinées",
+        description: "Jusqu'à -40% sur les boissons",
+        image: "/images/promos/mag3_promo1.jpg",
+      },
+      {
+        title: "Articles en promotions",
+        description: "Réductions jusqu'à 30%",
+        image: "/images/banner-1.jpg",
+      },
+      {
+        title: "Bons de réduction",
+        description: "Jusqu'à -40% sur les boissons",
+        image: "/images/promos/mag3_promo1.jpg",
+      },
+    ],
   };
 
   const promos = promosParMagasin[magasinId] || [];

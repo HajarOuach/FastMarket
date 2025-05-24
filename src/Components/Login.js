@@ -9,8 +9,6 @@ export default function Login({ onLogin }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // ✅ Lire le rôle attendu depuis l'URL
-
   const expectedRole = new URLSearchParams(location.search).get("role");
 
   const handleSubmit = async (e) => {
@@ -20,59 +18,76 @@ export default function Login({ onLogin }) {
     try {
       const response = await fetch("http://localhost:8080/utilisateurs/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email,
-          motDePasse: password,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, motDePasse: password }),
       });
 
-      if (response.ok) {
-        const user = await response.json();
-        delete user.motDePasse;
-
-        // ❌ Refuser la connexion si le rôle ne correspond pas
-        if (user.role !== expectedRole) {
-          setErrorMessage(`Ce compte est un ${user.role}. Veuillez utiliser la page de connexion dédiée.`);
-          return;
-        }
-
-        // ✅ Connexion valide
-        localStorage.setItem("client", JSON.stringify(user));
-        if (onLogin) onLogin(user);
-
-        switch (user.role) {
-          case "client":
-            navigate("/accueil"); // ✅ Page d’accueil publique
-            break;
-          case "preparateur":
-            navigate("/preparateur");
-            break;
-          case "gerant":
-            navigate("/gerant");
-            break;
-          default:
-            navigate("/");
-        }
-      } else if (response.status === 401) {
+      if (!response.ok) {
         setErrorMessage("Email ou mot de passe incorrect.");
-      } else {
-        setErrorMessage("Erreur inconnue du serveur.");
+        return;
+      }
+
+      const utilisateur = await response.json();
+      if (utilisateur.role !== expectedRole) {
+        setErrorMessage(`Ce compte est un ${utilisateur.role}. Veuillez utiliser la bonne page de connexion.`);
+        return;
+      }
+
+      // Déterminer l'URL de récupération complète selon le rôle
+      let apiUrl = "";
+      switch (utilisateur.role) {
+        case "client":
+          apiUrl = `http://localhost:8080/clients/email/${encodeURIComponent(utilisateur.email)}`;
+          break;
+        case "preparateur":
+          apiUrl = `http://localhost:8080/preparateurs/email/${encodeURIComponent(utilisateur.email)}`;
+          break;
+        case "gerant":
+          apiUrl = `http://localhost:8080/gerants/email/${encodeURIComponent(utilisateur.email)}`;
+          break;
+        default:
+          setErrorMessage("Rôle non pris en charge.");
+          return;
+      }
+
+      const userDetailsRes = await fetch(apiUrl);
+      if (!userDetailsRes.ok) {
+        setErrorMessage("Impossible de récupérer les informations détaillées.");
+        return;
+      }
+
+      const details = await userDetailsRes.json();
+      const userWithId = { ...utilisateur, id: details.id, magasin: details.magasin };
+      localStorage.setItem("client", JSON.stringify(userWithId));
+      if (onLogin) onLogin(userWithId);
+
+      // ✅ Redirection correcte vers /accueil-magasin/{id}
+      switch (utilisateur.role) {
+        case "client":
+          const magasinId = details.magasin?.id;
+          if (magasinId) {
+            navigate(`/accueil-magasin/${magasinId}`);
+          } else {
+            navigate("/accueil-magasin");
+          }
+          break;
+        case "preparateur":
+          navigate("/preparateur");
+          break;
+        case "gerant":
+          navigate("/gerant");
+          break;
+        default:
+          navigate("/");
       }
     } catch (error) {
       console.error("Erreur lors de la connexion :", error);
-      setErrorMessage("Impossible de contacter le serveur.");
+      setErrorMessage("Erreur réseau ou serveur.");
     }
   };
 
-  // ✅ Continuer en tant que visiteur
   const handleVisiteur = () => {
-    const visiteur = {
-      nom: "Visiteur",
-      role: expectedRole,
-    };
+    const visiteur = { nom: "Visiteur", role: expectedRole };
     localStorage.setItem("client", JSON.stringify(visiteur));
     if (onLogin) onLogin(visiteur);
     navigate("/choix-magasin");
@@ -81,9 +96,7 @@ export default function Login({ onLogin }) {
   return (
     <div className="container d-flex justify-content-center align-items-center min-vh-100">
       <div className="row border rounded-5 p-3 bg-white shadow box-area" style={{ width: "400px" }}>
-        <h3 className="text-center mb-4">
-          Connexion {expectedRole ? `(${expectedRole})` : ""}
-        </h3>
+        <h3 className="text-center mb-4">Connexion {expectedRole ? `(${expectedRole})` : ""}</h3>
 
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
@@ -110,16 +123,10 @@ export default function Login({ onLogin }) {
             />
           </div>
 
-          {errorMessage && (
-            <div className="alert alert-danger" role="alert">
-              {errorMessage}
-            </div>
-          )}
+          {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
 
           <div className="d-grid mb-2">
-            <button type="submit" className="btn btn-primary">
-              Se connecter
-            </button>
+            <button type="submit" className="btn btn-primary">Se connecter</button>
           </div>
         </form>
 

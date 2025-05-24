@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import AccueilMagasin from "./Components/AccueilMagasin";
 
-import AccueilMagasin from './Components/AccueilMagasin';
+
 import ChoixProfil from './Components/ChoixProfil';
 import Header from './Components/Header';
 import HeroSection from './Components/HeroSection';
@@ -67,16 +68,11 @@ function App() {
               <BestSellers />
               <Categories />
             </>
-          ) : <Navigate to="/accueil" />
+          ) : <Navigate to="/login" />
         } />
 
         {/* Accueil du client selon magasin sélectionné (visiteur ou client) */}
-        <Route path="/accueil-magasin/:id" element={
-          <>
-            <Header user={user} onLogout={handleLogout} />
-            <AccueilMagasin />
-          </>
-        } />
+       <Route path="/accueil-magasin/:id" element={<AccueilMagasin />} />
 
         {/* Page du gérant */}
         <Route path="/gerant" element={
