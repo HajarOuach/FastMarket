@@ -37,43 +37,34 @@ const ChoixMagasin = () => {
   const handleConfirmation = () => setConfirmation(true);
 
   const handleCommander = async () => {
-  if (!selectedMagasin) {
-    console.error("Aucun magasin sélectionné !");
-    return;
-  }
+    if (!selectedMagasin) {
+      console.error("Aucun magasin sélectionné !");
+      return;
+    }
 
-  const client = JSON.parse(localStorage.getItem("client"));
-  if (!client || !client.id) {
-    console.error("Client non connecté ou ID manquant !");
-    return;
-  }
+    const client = JSON.parse(localStorage.getItem("client"));
+    if (!client || !client.id) {
+      console.error("Client non connecté ou ID manquant !");
+      return;
+    }
 
-  try {
-    // Appel API pour enregistrer le magasin pour ce client
-    const response = await axios.put("http://localhost:8080/clients/modifierMagasin", {
-      clientId: client.id,
-      magasinId: selectedMagasin.id
-    });
+    try {
+      await axios.put("http://localhost:8080/clients/modifierMagasin", {
+        clientId: client.id,
+        magasinId: selectedMagasin.id
+      });
 
-    console.log("✅ Magasin mis à jour avec succès :", response.data);
+      console.log("Client avec magasin choisi :", {
+        ...client,
+        magasin: selectedMagasin
+      });
 
-    // Affichage du client + magasin en console
-    console.log("Client avec magasin choisi :", {
-      ...client,
-      magasin: selectedMagasin
-    });
-
-    // Enregistrer le magasin dans le localStorage
-    localStorage.setItem("magasin", JSON.stringify(selectedMagasin));
-
-    // Redirection vers accueil du magasin
-    navigate(`/accueil-magasin/${selectedMagasin.id}`);
-
-  } catch (error) {
-    console.error("❌ Erreur lors de la mise à jour du magasin :", error);
-  }
-};
-
+      localStorage.setItem("magasin", JSON.stringify(selectedMagasin));
+      navigate(`/accueil-magasin/${selectedMagasin.id}`);
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour du magasin :", error);
+    }
+  };
 
   const handleChangerMagasin = () => {
     setSelectedMagasin(null);
