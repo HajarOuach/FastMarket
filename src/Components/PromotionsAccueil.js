@@ -4,7 +4,7 @@ function BestSellers() {
   return (
     <div className="container my-5" id="best-sellers">
       <div className="row g-4">
-        {/* Bloc principal à gauche */}
+        {/* bloc principal à gauche */}
         <div className="col-md-8">
           <div
             className="d-flex align-items-center rounded-4 shadow overflow-hidden"
