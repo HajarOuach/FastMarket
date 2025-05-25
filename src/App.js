@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import AccueilMagasin from "./Components/AccueilMagasin";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 import ChoixProfil from './Components/ChoixProfil';
 import Header from './Components/Header';
