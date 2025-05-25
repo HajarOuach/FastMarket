@@ -9,7 +9,10 @@ function Header({ onLogout }) {
   // 🔸 On récupère l'utilisateur connecté depuis localStorage
   const user = JSON.parse(localStorage.getItem("client"));
   const isVisiteur = user?.nom === "Visiteur";
-  const hasMagasin = user?.magasin || localStorage.getItem("magasin");
+  const magasinStorage = localStorage.getItem("magasin");
+const magasinId = user?.magasin?.id || (magasinStorage && JSON.parse(magasinStorage)?.id);
+const hasMagasin = !!magasinId;
+
   const canAccessHome = !isVisiteur && !!hasMagasin;
 
   const handleLogout = () => {
@@ -31,20 +34,17 @@ function Header({ onLogout }) {
           {/* Logo */}
           <Col xs={6} lg={2}>
             <Link
-              to={
-                canAccessHome
-                  ? `/accueil-magasin/${user?.magasin?.id || localStorage.getItem("magasin")}`
-                  : "#"
-              }
-              className="text-decoration-none"
-            >
-              <img
-                src="/images/LogoMarket2 (2).png"
-                alt="FastMarket Logo"
-                className="img-fluid"
-                style={{ maxHeight: 80 }}
-              />
-            </Link>
+  to={canAccessHome ? `/accueil-magasin/${magasinId}` : "#"}
+  className="text-decoration-none"
+>
+  <img
+    src="/images/LogoMarket2 (2).png"
+    alt="FastMarket Logo"
+    className="img-fluid"
+    style={{ maxHeight: 80 }}
+  />
+</Link>
+
           </Col>
 
           {/* Barre de recherche */}
@@ -61,15 +61,12 @@ function Header({ onLogout }) {
           {/* Liens de navigation */}
           <Col lg={3} className="d-none d-lg-flex justify-content-center gap-3 fw-semibold text-uppercase small">
             <Link
-              to={
-                canAccessHome
-                  ? `/accueil-magasin/${user?.magasin?.id || localStorage.getItem("magasin")}`
-                  : "#"
-              }
-              className={`text-decoration-none ${canAccessHome ? "text-dark" : "text-secondary disabled"}`}
-            >
-              Home
-            </Link>
+  to={canAccessHome ? `/accueil-magasin/${magasinId}` : "#"}
+  className={`text-decoration-none ${canAccessHome ? "text-dark" : "text-secondary disabled"}`}
+>
+  Home
+</Link>
+
 
             <Link to="/catalogue" className="text-dark text-decoration-none">
               Catégories

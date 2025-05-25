@@ -4,13 +4,13 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './Catalogue.css';
 
 const categoryData = [
-  { title: 'Fruits & Légumes', img: '/images/category-thumb-1.jpg' },
+  { title: 'Fruits & Légumes', img: '/images/sample-image.jpg' },
   { title: 'Pains & Desserts', img: '/images/category-thumb-2.jpg' },
   { title: 'Boissons', img: '/images/category-thumb-3.webp' },
   { title: 'Produits ménagers', img: '/images/houseCleaning.webp' },
   { title: 'Viandes & Volailles', img: '/images/category-thumb-5.jpg' },
   { title: 'Bébé & Puériculture', img: '/images/bebe.jpeg' },
-  { title: 'Produits laitiers & Œufs', img: '/images/category-thumb-7.jpg' },
+  { title: 'Produits laitiers & Œufs', img: '/images/lait.jpg' },
   { title: 'Surgelés', img: '/images/surgele.jpeg' },
   { title: 'Snacks & Chips', img: '/images/snacks.jpeg' },
   { title: 'Céréales & Petits-déjeuners', img: '/images/cereals.jpeg' },
@@ -22,8 +22,10 @@ const Catalogue = () => {
   const navigate = useNavigate();
 
   const handleVoirProduits = (categorie) => {
-    const client = JSON.parse(localStorage.getItem("client"));
-    const magasinId = client?.magasin?.id;
+   const client = JSON.parse(localStorage.getItem("client"));
+const magasinStorage = JSON.parse(localStorage.getItem("magasin")); // au cas où seul l'id est stocké
+const magasinId = client?.magasin?.id || magasinStorage?.id || magasinStorage;
+
     if (magasinId) {
       navigate(`/produits?categorie=${encodeURIComponent(categorie)}&magasinId=${magasinId}`);
     } else {

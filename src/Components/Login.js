@@ -100,7 +100,7 @@ export default function Login({ onLogin }) {
     <div className="container d-flex justify-content-center align-items-center min-vh-100">
       <div className="row border rounded-5 p-3 bg-white shadow box-area" style={{ width: "400px" }}>
         <h3 className="text-center mb-4">Connexion {expectedRole ? `(${expectedRole})` : ""}</h3>
-        <h3 className="text-center mb-4">Connexion {expectedRole ? `(${expectedRole})` : ""}</h3>
+        
 
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
@@ -130,7 +130,7 @@ export default function Login({ onLogin }) {
           {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
 
           <div className="d-grid mb-2">
-            <button type="submit" className="btn btn-primary">Se connecter</button>
+            
             <button type="submit" className="btn btn-primary">Se connecter</button>
           </div>
         </form>
