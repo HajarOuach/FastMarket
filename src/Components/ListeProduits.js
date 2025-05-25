@@ -245,4 +245,5 @@ export default function ListeProduits() {
 
   //sanda
   //commentaire
+  //commentaire 2
 }
