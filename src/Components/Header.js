@@ -8,12 +8,14 @@ function Header({ onLogout }) {
 
   const user = JSON.parse(localStorage.getItem("client"));
   const isVisiteur = user?.nom === "Visiteur";
-  const magasinId = user?.magasin?.id;
+  const magasinId = localStorage.getItem("magasinId") || '';
+  console.log("User:", user);
+  console.log(" Magasin ID:", magasinId);
 
   const handleLogout = () => {
     if (onLogout) onLogout();
     setShowMenu(false);
-    navigate('/');
+    navigate('/toto', { state: { user } });
   };
 
   const handleLoginClick = () => {
