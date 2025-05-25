@@ -242,4 +242,8 @@ export default function ListeProduits() {
       )}
     </div>
   );
+
+  //sanda
+  //commentaire
+  //commentaire 2
 }
