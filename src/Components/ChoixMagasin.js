@@ -36,14 +36,34 @@ const ChoixMagasin = () => {
 
   const handleConfirmation = () => setConfirmation(true);
 
-  const handleCommander = () => {
+  const handleCommander = async () => {
     if (!selectedMagasin) {
       console.error("Aucun magasin sélectionné !");
       return;
     }
-    localStorage.setItem("magasin", JSON.stringify(selectedMagasin));
-  navigate(`/accueil-magasin/${selectedMagasin.id}`);
 
+    const client = JSON.parse(localStorage.getItem("client"));
+    if (!client || !client.id) {
+      console.error("Client non connecté ou ID manquant !");
+      return;
+    }
+
+    try {
+      await axios.put("http://localhost:8080/clients/modifierMagasin", {
+        clientId: client.id,
+        magasinId: selectedMagasin.id
+      });
+
+      console.log("Client avec magasin choisi :", {
+        ...client,
+        magasin: selectedMagasin
+      });
+
+      localStorage.setItem("magasin", JSON.stringify(selectedMagasin));
+      navigate(`/accueil-magasin/${selectedMagasin.id}`);
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour du magasin :", error);
+    }
   };
 
   const handleChangerMagasin = () => {
