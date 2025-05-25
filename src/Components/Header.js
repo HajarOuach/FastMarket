@@ -6,14 +6,9 @@ function Header({ onLogout }) {
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false);
 
-  // 🔸 On récupère l'utilisateur connecté depuis localStorage
   const user = JSON.parse(localStorage.getItem("client"));
   const isVisiteur = user?.nom === "Visiteur";
-  const magasinStorage = localStorage.getItem("magasin");
-const magasinId = user?.magasin?.id || (magasinStorage && JSON.parse(magasinStorage)?.id);
-const hasMagasin = !!magasinId;
-
-  const canAccessHome = !isVisiteur && !!hasMagasin;
+  const magasinId = user?.magasin?.id;
 
   const handleLogout = () => {
     if (onLogout) onLogout();
@@ -30,21 +25,19 @@ const hasMagasin = !!magasinId;
     <header className="py-2 border-bottom bg-white shadow-sm">
       <Container fluid>
         <Row className="align-items-center gx-3">
-
           {/* Logo */}
           <Col xs={6} lg={2}>
             <Link
-  to={canAccessHome ? `/accueil-magasin/${magasinId}` : "#"}
-  className="text-decoration-none"
->
-  <img
-    src="/images/LogoMarket2 (2).png"
-    alt="FastMarket Logo"
-    className="img-fluid"
-    style={{ maxHeight: 80 }}
-  />
-</Link>
-
+              to={`/accueil-magasin/${magasinId || ''}`}
+              className="text-decoration-none"
+            >
+              <img
+                src="/images/LogoMarket2 (2).png"
+                alt="FastMarket Logo"
+                className="img-fluid"
+                style={{ maxHeight: 80 }}
+              />
+            </Link>
           </Col>
 
           {/* Barre de recherche */}
@@ -61,12 +54,11 @@ const hasMagasin = !!magasinId;
           {/* Liens de navigation */}
           <Col lg={3} className="d-none d-lg-flex justify-content-center gap-3 fw-semibold text-uppercase small">
             <Link
-  to={canAccessHome ? `/accueil-magasin/${magasinId}` : "#"}
-  className={`text-decoration-none ${canAccessHome ? "text-dark" : "text-secondary disabled"}`}
->
-  Home
-</Link>
-
+              to={`/accueil-magasin/${magasinId || ''}`}
+              className="text-decoration-none text-dark"
+            >
+              Home
+            </Link>
 
             <Link to="/catalogue" className="text-dark text-decoration-none">
               Catégories
@@ -101,7 +93,6 @@ const hasMagasin = !!magasinId;
               </svg>
             </Link>
           </Col>
-
         </Row>
       </Container>
     </header>

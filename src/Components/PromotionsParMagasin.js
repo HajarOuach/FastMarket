@@ -1,5 +1,5 @@
 import React from 'react';
-
+ 
 const PromotionsParMagasin = ({ magasinId }) => {
   const promosParMagasin = {
     1: [
