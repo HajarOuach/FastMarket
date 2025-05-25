@@ -20,6 +20,7 @@ function Panier() {
               image: ligne.produit.image,
               enStock: true,
             }));
+            console.log("Articles dans le panier :", articles); // ✅ Log
             setArticles(articles);
           }
         })
@@ -38,30 +39,61 @@ function Panier() {
   };
 
   const viderPanier = () => {
-    if (clientId) {
-      fetch(`http://localhost:8080/panier/${clientId}/vider`, {
-        method: "DELETE",
+    if (!clientId) return;
+
+    const confirmation = window.confirm("Êtes-vous sûr de vouloir vider le panier ?");
+
+    if (!confirmation) return;
+
+    fetch(`http://localhost:8080/panier/${clientId}/vider`, {
+      method: "DELETE",
+    })
+      .then(() => {
+        setArticles([]);
+        console.log("Panier vidé avec succès.");
       })
-        .then(() => setArticles([]))
-        .catch((err) => console.error("Erreur vidage panier :", err));
-    }
+      .catch((err) => {
+        console.error("Erreur vidage panier :", err);
+        alert("Erreur lors de la suppression du panier.");
+      });
   };
 
   const validerCommande = () => {
-    if (clientId) {
-      fetch(`http://localhost:8080/panier/valider/${clientId}`, {
-        method: "PUT",
-      })
-        .then((res) => {
-          if (res.ok) {
-            alert("Commande validée avec succès !");
-            setArticles([]);
-          } else {
-            alert("Erreur lors de la validation.");
-          }
-        })
-        .catch(() => alert("Erreur serveur lors de la validation."));
+    const magasinId = localStorage.getItem("magasinId");
+    const creneauId = localStorage.getItem("creneauId");
+
+    if (!magasinId || !creneauId) {
+      alert("Veuillez choisir un magasin et un créneau avant de valider la commande.");
+      return;
     }
+
+    fetch("http://localhost:8080/panier/valider", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        clientId: client.id,
+        magasinId: parseInt(magasinId),
+        creneauId: parseInt(creneauId),
+      }),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Échec de la validation");
+        }
+        return res.blob();
+      })
+      .then((blob) => {
+        const pdfUrl = window.URL.createObjectURL(blob);
+        window.open(pdfUrl);
+        alert("Commande validée avec succès !");
+        setArticles([]);
+      })
+      .catch((err) => {
+        console.error("Erreur validation panier :", err);
+        alert("Erreur lors de la validation de la commande.");
+      });
   };
 
   const total = articles
@@ -82,16 +114,13 @@ function Panier() {
               key={article.idLigne}
             >
               <img src={article.image} alt={article.nom} className="article-image" />
-
               <div className="article-infos">
                 <div className="article-nom">{article.nom}</div>
-
                 {article.enStock ? (
                   <div className="article-stock">En stock</div>
                 ) : (
                   <div className="article-stock rupture">Rupture de stock</div>
                 )}
-
                 <div className="article-prix">{article.prix.toFixed(2)} €</div>
 
                 <div className="quantite-et-soustotal">

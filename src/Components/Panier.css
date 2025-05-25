@@ -137,3 +137,13 @@
   margin-top: 1rem;
   gap: 1rem;
 }
+
+.modal {
+  z-index: 1055;
+  display: block !important;
+}
+
+.modal-backdrop.show{
+  z-index: 1050;
+  opacity: 0.5;
+}
