@@ -13,11 +13,31 @@ export default function GestionCommandes() {
   }, []);
 
   const changerStatut = (commandeId, nouveauStatut) => {
-    setCommandes((prevCommandes) =>
-      prevCommandes.map((commande) =>
-        commande.id === commandeId
-          ? { ...commande, statut: nouveauStatut }
-          : commande
+    if (nouveauStatut === "En cours de traitement") {
+      axios
+        .put("http://localhost:8080/commandes/traiter", {
+          commandeId,
+          preparateurId: 32,
+        })
+        .then(() => majCommandeLocalement(commandeId, nouveauStatut))
+        .catch((err) => console.error(err));
+    } else if (nouveauStatut === "Traité") {
+      axios
+        .put("http://localhost:8080/commandes/marquerTraitee", {
+          commandeId,
+        })
+        .then(() => majCommandeLocalement(commandeId, nouveauStatut))
+        .catch((err) => console.error(err));
+    } else if (nouveauStatut === "Annulée") {
+      // Pas encore de route côté back, on l'actualise seulement en local
+      majCommandeLocalement(commandeId, nouveauStatut);
+    }
+  };
+
+  const majCommandeLocalement = (commandeId, nouveauStatut) => {
+    setCommandes((prev) =>
+      prev.map((commande) =>
+        commande.id === commandeId ? { ...commande, statut: nouveauStatut } : commande
       )
     );
   };
@@ -28,37 +48,60 @@ export default function GestionCommandes() {
     <div className="container">
       <h1 className="title">Commandes à Préparer</h1>
 
-      <div className="commandes-list">
-        {commandes.map((commande) => (
-          <div key={commande.id} className="commande-card">
-            <h2>Commande #{commande.id}</h2>
-            <p><strong>Client :</strong> {commande.client?.nom}</p>
-            <p><strong>Date :</strong> {new Date(commande.dateCommande).toLocaleString()}</p>
-            <p><strong>Créneau :</strong> {formatHeure(commande.creneau?.heureDebut)} - {formatHeure(commande.creneau?.heureFin)}</p>
-            <p><strong>Statut :</strong> {commande.statut}</p>
+      <table className="commande-table">
+        <thead>
+          <tr>
+            <th>Numéro</th>
+            <th>Client</th>
+            <th>Date</th>
+            <th>Heure</th>
+            <th>Créneau</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {commandes.map((commande) => {
+            const date = new Date(commande.dateCommande);
+            const dateStr = date.toLocaleDateString();
+            const heureStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            return (
+              <tr key={commande.id}>
+                <td>{commande.id}</td>
+                <td>{commande.client?.nom || "Client inconnu"}</td>
+                <td>{dateStr}</td>
+                <td>{heureStr}</td>
+                <td>
+                  {formatHeure(commande.creneau?.heureDebut)} - {formatHeure(commande.creneau?.heureFin)}
+                </td>
+                <td>{commande.statut}</td>
+                <td className="actions">
+                  {commande.statut === "Commandé" && (
+                    <button onClick={() => changerStatut(commande.id, "En cours de traitement")} className="btn yellow">Traiter</button>
+                  )}
+                  {commande.statut === "En cours de traitement" && (
+                    <>
+                      <button onClick={() => changerStatut(commande.id, "Traité")} className="btn green">Terminer</button>
+                      <button onClick={() => changerStatut(commande.id, "Annulée")} className="btn red">Annuler</button>
+                    </>
+                  )}
+                  <button onClick={() => setCommandeActive(commande)} className="btn blue">Détails</button>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
 
-            <div className="actions">
-              {commande.statut === "Commandé" && (
-                <button onClick={() => changerStatut(commande.id, "En préparation")} className="btn yellow">Traiter</button>
-              )}
-              {commande.statut === "En préparation" && (
-                <button onClick={() => changerStatut(commande.id, "Terminé")} className="btn green">Terminer</button>
-              )}
-              <button onClick={() => setCommandeActive(commande)} className="btn blue">Détails</button>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Détails commande */}
       {commandeActive && (
         <div className="popup-overlay" onClick={() => setCommandeActive(null)}>
           <div className="popup" onClick={(e) => e.stopPropagation()}>
-            <h3>Détails de la commande #{commandeActive.id}</h3>
+            <h3>Détails de la commande {commandeActive.id}</h3>
             <ul>
               {commandeActive.lignesCommande.map((ligne) => (
                 <li key={ligne.id}>
-                  {ligne.produit?.libelle} – <strong>{ligne.quantite}</strong>
+                  Produit : <strong>{ligne.produit?.libelle}</strong> <br></br> 
+                  Quantité : <strong>{ligne.quantite}</strong>
                 </li>
               ))}
             </ul>
@@ -67,7 +110,6 @@ export default function GestionCommandes() {
         </div>
       )}
 
-      {/* STYLES */}
       <style jsx>{`
         .container {
           padding: 2rem;
@@ -79,25 +121,22 @@ export default function GestionCommandes() {
           margin-bottom: 2rem;
         }
 
-        .commandes-list {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-          gap: 1.5rem;
+        .commande-table {
+          width: 100%;
+          border-collapse: collapse;
         }
 
-        .commande-card {
-          background: #fff;
+        .commande-table th,
+        .commande-table td {
           border: 1px solid #ccc;
-          border-radius: 12px;
-          padding: 1rem;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+          padding: 0.5rem;
+          text-align: center;
         }
 
         .actions {
-          margin-top: 1rem;
           display: flex;
           gap: 0.5rem;
-          flex-wrap: wrap;
+          justify-content: center;
         }
 
         .btn {
@@ -127,8 +166,10 @@ export default function GestionCommandes() {
 
         .popup-overlay {
           position: fixed;
-          top: 0; left: 0;
-          width: 100%; height: 100%;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
           background-color: rgba(0, 0, 0, 0.6);
           display: flex;
           align-items: center;
