@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import AccueilMagasin from "./Components/AccueilMagasin";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useLocation } from "react-router-dom";
 
 import ChoixProfil from './Components/ChoixProfil';
 import Header from './Components/Header';
@@ -20,10 +21,13 @@ import Panier from './Components/Panier';
 import ListeProduits from './Components/ListeProduits';
 
 function App() {
+  const location = useLocation();
+  const userState = location.state?.user;
   const [user, setUser] = useState(null);
   const [produits, setProduits] = useState([]);
   const [produitsLoaded, setProduitsLoaded] = useState(false);
-
+  console.log(" App User state:", userState);
+  console.log(" App User from localStorage:", user);
   useEffect(() => {
     fetch("http://localhost:8080/produits")
       .then((res) => res.json())
@@ -111,7 +115,7 @@ function App() {
               <Header onLogout={handleLogout} />
               <Panier />
             </>
-          ) : <Navigate to="/login" />
+          ) : <Navigate to={`/login?role=client`} />
         } />
 
         <Route path="/choix-magasin" element={<ChoixMagasin />} />

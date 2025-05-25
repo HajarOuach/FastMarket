@@ -67,6 +67,8 @@ export default function Login({ onLogin }) {
       switch (utilisateur.role) {
         case "client":
           const magasinId = details.magasin?.id;
+          console.log(" Login ID du magasin :", magasinId);
+          localStorage.setItem("magasinId", magasinId ? magasinId.toString() : ""); 
           if (magasinId) {
             navigate(`/accueil-magasin/${magasinId}`);
           } else {
