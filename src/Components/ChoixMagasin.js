@@ -10,7 +10,7 @@ const ChoixMagasin = () => {
   const [showModal, setShowModal] = useState(false);
   const [confirmation, setConfirmation] = useState(false);
   const [selectedDate, setSelectedDate] = useState('');
-  const [selectedCreneau, setSelectedCreneau] = useState('');
+  const [selectedCreneau, setSelectedCreneau] = useState(null);
   const navigate = useNavigate();
   const dateCreneauRef = useRef(null);
 
@@ -22,23 +22,20 @@ const ChoixMagasin = () => {
 
   const handleChoixMagasin = (magasin) => {
     if (!magasin) return;
-    console.log("Magasin sélectionné :", magasin);
     setSelectedMagasin(magasin);
     setConfirmation(false);
     setSelectedDate('');
-    setSelectedCreneau('');
+    setSelectedCreneau(null);
     setTimeout(() => {
-      if (dateCreneauRef.current) {
-        dateCreneauRef.current.scrollIntoView({ behavior: 'smooth' });
-      }
+      dateCreneauRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, 100);
   };
 
   const handleConfirmation = () => setConfirmation(true);
 
   const handleCommander = async () => {
-    if (!selectedMagasin) {
-      console.error("Aucun magasin sélectionné !");
+    if (!selectedMagasin || !selectedCreneau) {
+      console.error("Magasin ou créneau manquant !");
       return;
     }
 
@@ -54,12 +51,9 @@ const ChoixMagasin = () => {
         magasinId: selectedMagasin.id
       });
 
-      console.log("Client avec magasin choisi :", {
-        ...client,
-        magasin: selectedMagasin
-      });
-
       localStorage.setItem("magasin", JSON.stringify(selectedMagasin));
+      localStorage.setItem("creneauId", selectedCreneau.id);
+
       navigate(`/accueil-magasin/${selectedMagasin.id}`);
     } catch (error) {
       console.error("Erreur lors de la mise à jour du magasin :", error);
@@ -69,25 +63,12 @@ const ChoixMagasin = () => {
   const handleChangerMagasin = () => {
     setSelectedMagasin(null);
     setSelectedDate('');
-    setSelectedCreneau('');
+    setSelectedCreneau(null);
     setConfirmation(false);
   };
 
-  const handleConfirmMagasin = () => setShowModal(false);
-
   const today = new Date().toISOString().split('T')[0];
-
-  const magasinsToShow = Array.isArray(magasins)
-    ? (selectedMagasin ? [selectedMagasin] : magasins)
-    : [];
-
-  const creneauxDisponibles = selectedMagasin?.creneaux?.length
-    ? selectedMagasin.creneaux.sort((a, b) => a.heureDebut.localeCompare(b.heureDebut)).map(c => {
-        const debut = c.heureDebut.substring(0, 5);
-        const fin = c.heureFin.substring(0, 5);
-        return `${debut} - ${fin}`;
-      })
-    : [];
+  const creneauxDisponibles = selectedMagasin?.creneaux || [];
 
   return (
     <div className="container mt-5">
@@ -98,7 +79,7 @@ const ChoixMagasin = () => {
       </div>
 
       <div className="row justify-content-center mb-4">
-        {magasinsToShow.map((magasin) => {
+        {(selectedMagasin ? [selectedMagasin] : magasins).map((magasin) => {
           const isSelected = selectedMagasin?.id === magasin.id;
           return (
             <div key={magasin.id} className="col-md-4 mb-4 position-relative">
@@ -161,7 +142,7 @@ const ChoixMagasin = () => {
               min={today}
               onChange={(e) => {
                 setSelectedDate(e.target.value);
-                setSelectedCreneau('');
+                setSelectedCreneau(null);
               }}
             />
           </div>
@@ -173,12 +154,17 @@ const ChoixMagasin = () => {
                 <select
                   id="creneau"
                   className="form-select"
-                  value={selectedCreneau}
-                  onChange={(e) => setSelectedCreneau(e.target.value)}
+                  value={selectedCreneau?.id || ''}
+                  onChange={(e) => {
+                    const creneau = creneauxDisponibles.find(c => c.id.toString() === e.target.value);
+                    setSelectedCreneau(creneau || null);
+                  }}
                 >
                   <option value="">-- Sélectionner un créneau --</option>
-                  {creneauxDisponibles.map((c, i) => (
-                    <option key={i} value={c}>{c}</option>
+                  {creneauxDisponibles.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.heureDebut.substring(0, 5)} - {c.heureFin.substring(0, 5)}
+                    </option>
                   ))}
                 </select>
               ) : (
@@ -197,9 +183,9 @@ const ChoixMagasin = () => {
 
           {confirmation && (
             <div className="alert alert-success mt-4 text-center">
-              <p className="mb-1">✅ Vous avez choisi : <strong>{selectedMagasin.nom}</strong></p>
+              <p className="mb-1">✅ Magasin : <strong>{selectedMagasin.nom}</strong></p>
               <p className="mb-1">📅 Date : <strong>{selectedDate}</strong></p>
-              <p>⏰ Créneau : <strong>{selectedCreneau}</strong></p>
+              <p>⏰ Créneau : <strong>{selectedCreneau.heureDebut.substring(0, 5)} - {selectedCreneau.heureFin.substring(0, 5)}</strong></p>
               <button className="btn btn-primary mt-3" onClick={handleCommander}>
                 Commander
               </button>
@@ -217,7 +203,7 @@ const ChoixMagasin = () => {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowModal(false)}>Annuler</Button>
-          <Button variant="primary" onClick={handleConfirmMagasin}>Confirmer</Button>
+          <Button variant="primary" onClick={handleCommander}>Confirmer</Button>
         </Modal.Footer>
       </Modal>
     </div>
