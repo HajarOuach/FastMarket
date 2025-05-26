@@ -16,47 +16,49 @@ const ChoixMagasin = () => {
 
   useEffect(() => {
     axios.get("http://localhost:8080/magasins/top5")
-      .then(response => setMagasins(response.data))
-      .catch(error => console.error("Erreur lors du chargement des magasins :", error));
+      .then(res => setMagasins(res.data))
+      .catch(err => console.error("Erreur chargement magasins :", err));
   }, []);
 
   const handleChoixMagasin = (magasin) => {
-    if (!magasin) return;
     setSelectedMagasin(magasin);
     setConfirmation(false);
     setSelectedDate('');
     setSelectedCreneau(null);
-    setTimeout(() => {
-      dateCreneauRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
+    setTimeout(() => dateCreneauRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
   };
 
   const handleConfirmation = () => setConfirmation(true);
 
   const handleCommander = async () => {
-    if (!selectedMagasin || !selectedCreneau) {
-      console.error("Magasin ou créneau manquant !");
-      return;
-    }
-
     const client = JSON.parse(localStorage.getItem("client"));
-    if (!client || !client.id) {
-      console.error("Client non connecté ou ID manquant !");
+    if (!client || !client.id || !selectedMagasin || !selectedCreneau) {
+      alert("Veuillez sélectionner un magasin et un créneau.");
       return;
     }
 
     try {
+      // 1. Met à jour le magasin du client
       await axios.put("http://localhost:8080/clients/modifierMagasin", {
         clientId: client.id,
-        magasinId: selectedMagasin.id
+        magasinId: selectedMagasin.id,
       });
 
-      localStorage.setItem("magasin", JSON.stringify(selectedMagasin));
-      localStorage.setItem("creneauId", selectedCreneau.id);
+      // 2. Recharge les données du client pour récupérer le magasin mis à jour
+      const updatedClient = await axios.get(`http://localhost:8080/clients/${client.id}`);
+      localStorage.setItem("client", JSON.stringify(updatedClient.data));
 
+      // 3. Stocke les infos utiles
+      localStorage.setItem("magasinId", selectedMagasin.id.toString());
+      localStorage.setItem("magasin", JSON.stringify(selectedMagasin));
+      localStorage.setItem("creneauId", selectedCreneau.id.toString());
+      localStorage.setItem("dateRetrait", selectedDate);
+
+      console.log("Magasin mis à jour avec succès :", selectedMagasin);
       navigate(`/accueil-magasin/${selectedMagasin.id}`);
-    } catch (error) {
-      console.error("Erreur lors de la mise à jour du magasin :", error);
+    } catch (err) {
+      console.error("Erreur lors de la mise à jour du magasin :", err);
+      alert("Une erreur est survenue. Veuillez réessayer.");
     }
   };
 
@@ -88,7 +90,6 @@ const ChoixMagasin = () => {
                   <div
                     onClick={() => handleChoixMagasin(magasin)}
                     role="button"
-                    aria-label={isSelected ? 'Sélectionné' : 'Choisir'}
                     style={{
                       width: '24px',
                       height: '24px',
@@ -111,11 +112,9 @@ const ChoixMagasin = () => {
                     )}
                   </div>
                 </div>
-                <div className="card-body d-flex flex-column justify-content-between">
-                  <div>
-                    <h5 className="card-title">{magasin.nom}</h5>
-                    <p className="card-text text-secondary">{magasin.adresse}</p>
-                  </div>
+                <div className="card-body">
+                  <h5 className="card-title">{magasin.nom}</h5>
+                  <p className="card-text text-secondary">{magasin.adresse}</p>
                 </div>
               </div>
             </div>
