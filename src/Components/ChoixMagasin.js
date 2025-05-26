@@ -41,7 +41,7 @@ const ChoixMagasin = () => {
       // 1. Met à jour le magasin du client
       await axios.put("http://localhost:8080/clients/modifierMagasin", {
         clientId: client.id,
-        magasinId: selectedMagasin.id,
+        magasinId: selectedMagasin.id
       });
 
       // 2. Recharge les données du client pour récupérer le magasin mis à jour
