@@ -108,7 +108,9 @@ function Panier() {
         return res.blob();
       })
       .then((blob) => {
+      
         const pdfUrl = window.URL.createObjectURL(blob);
+        console.log("PDF généré avec succès :", pdfUrl);
         window.open(pdfUrl);
         alert("Commande validée avec succès !");
         setArticles([]);
