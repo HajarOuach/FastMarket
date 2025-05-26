@@ -73,7 +73,7 @@ export default function Login({ onLogin }) {
             navigate(`/accueil-magasin/${magasinId}`);
           } else {
             navigate("/accueil-magasin");
-          }
+        }
           break;
         case "preparateur":
           navigate("/preparateur");
