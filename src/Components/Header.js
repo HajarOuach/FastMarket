@@ -65,6 +65,10 @@ function Header({ onLogout }) {
             <Link to="/catalogue" className="text-dark text-decoration-none">
               Catégories
             </Link>
+
+            <Link to="/liste-courses" className="text-dark text-decoration-none">
+              Liste de courses
+            </Link>
           </Col>
 
           {/* Profil + Panier */}
