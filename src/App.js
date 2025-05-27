@@ -58,12 +58,7 @@ function App() {
     <>
       <Routes>
         <Route path="/" element={
-          user ? (
-            user.role === "client" ? <Navigate to={`/accueil-magasin/${magasinId}`} /> :
-            user.role === "gerant" ? <Navigate to="/gerant" /> :
-            user.role === "preparateur" ? <Navigate to="/preparateur" /> :
-            <ChoixProfil />
-          ) : <ChoixProfil />
+          <ChoixProfil />
         } />
 
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
