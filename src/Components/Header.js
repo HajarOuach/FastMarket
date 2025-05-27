@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Container, Row, Col, Form, FormControl, Dropdown } from 'react-bootstrap';
+import { Container, Row, Col, Dropdown } from 'react-bootstrap';
+import SearchBar from './SearchBar'; // ← Import du nouveau composant
 
 function Header({ onLogout }) {
   const navigate = useNavigate();
@@ -9,8 +10,6 @@ function Header({ onLogout }) {
   const user = JSON.parse(localStorage.getItem("client"));
   const isVisiteur = user?.nom === "Visiteur";
   const magasinId = localStorage.getItem("magasinId") || '';
-  console.log("User:", user);
-  console.log(" Magasin ID:", magasinId);
 
   const handleLogout = () => {
     if (onLogout) onLogout();
@@ -29,10 +28,7 @@ function Header({ onLogout }) {
         <Row className="align-items-center gx-3">
           {/* Logo */}
           <Col xs={6} lg={2}>
-            <Link
-              to={`/accueil-magasin/${magasinId || ''}`}
-              className="text-decoration-none"
-            >
+            <Link to={`/accueil-magasin/${magasinId}`} className="text-decoration-none">
               <img
                 src="/images/LogoMarket2 (2).png"
                 alt="FastMarket Logo"
@@ -42,26 +38,18 @@ function Header({ onLogout }) {
             </Link>
           </Col>
 
-          {/* Barre de recherche */}
+          {/* Barre de recherche avec suggestions */}
           <Col xs={12} lg={5}>
-            <Form className="d-flex bg-light rounded-pill px-3 py-2 shadow-sm align-items-center">
-              <FormControl
-                type="search"
-                placeholder="Rechercher un article"
-                className="border-0 bg-transparent w-100"
-              />
-            </Form>
+            <div className="bg-light rounded-pill px-3 py-2 shadow-sm">
+              <SearchBar magasinId={magasinId} />
+            </div>
           </Col>
 
           {/* Liens de navigation */}
           <Col lg={3} className="d-none d-lg-flex justify-content-center gap-3 fw-semibold text-uppercase small">
-            <Link
-              to={`/accueil-magasin/${magasinId || ''}`}
-              className="text-decoration-none text-dark"
-            >
+            <Link to={`/accueil-magasin/${magasinId}`} className="text-decoration-none text-dark">
               Home
             </Link>
-
             <Link to="/catalogue" className="text-dark text-decoration-none">
               Catégories
             </Link>
@@ -74,9 +62,7 @@ function Header({ onLogout }) {
                 <svg width="20" height="20" viewBox="0 0 24 24">
                   <path fill="currentColor" d="M12 12a5 5 0 1 0 0-10a5 5 0 0 0 0 10Zm0 2c-3.3 0-6 2.7-6 6h2a4 4 0 0 1 8 0h2c0-3.3-2.7-6-6-6Z" />
                 </svg>
-                {user?.prenom && (
-                  <span className="fw-semibold text-dark">{user.prenom}</span>
-                )}
+                {user?.prenom && <span className="fw-semibold text-dark">{user.prenom}</span>}
               </Dropdown.Toggle>
               <Dropdown.Menu align="end">
                 {!user || isVisiteur ? (
