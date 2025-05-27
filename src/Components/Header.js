@@ -8,9 +8,8 @@ function Header({ onLogout }) {
 
   const user = JSON.parse(localStorage.getItem("client"));
   const isVisiteur = user?.nom === "Visiteur";
+  const role = user?.role;
   const magasinId = localStorage.getItem("magasinId") || '';
-  console.log("User:", user);
-  console.log(" Magasin ID:", magasinId);
 
   const handleLogout = () => {
     if (onLogout) onLogout();
@@ -30,7 +29,7 @@ function Header({ onLogout }) {
           {/* Logo */}
           <Col xs={6} lg={2}>
             <Link
-              to={`/accueil-magasin/${magasinId || ''}`}
+              to={`/accueil-magasin/${magasinId}`}
               className="text-decoration-none"
             >
               <img
@@ -43,7 +42,7 @@ function Header({ onLogout }) {
           </Col>
 
           {/* Barre de recherche */}
-          <Col xs={12} lg={5}>
+          <Col xs={12} lg={4}>
             <Form className="d-flex bg-light rounded-pill px-3 py-2 shadow-sm align-items-center">
               <FormControl
                 type="search"
@@ -53,10 +52,10 @@ function Header({ onLogout }) {
             </Form>
           </Col>
 
-          {/* Liens de navigation */}
-          <Col lg={3} className="d-none d-lg-flex justify-content-center gap-3 fw-semibold text-uppercase small">
+          {/* Liens de navigation dynamiques */}
+          <Col lg={4} className="d-none d-lg-flex justify-content-center gap-3 fw-semibold text-uppercase small">
             <Link
-              to={`/accueil-magasin/${magasinId || ''}`}
+              to={`/accueil-magasin/${magasinId}`}
               className="text-decoration-none text-dark"
             >
               Home
@@ -66,9 +65,19 @@ function Header({ onLogout }) {
               Catégories
             </Link>
 
-            <Link to="/liste-courses" className="text-dark text-decoration-none">
-              Liste de courses
-            </Link>
+            {/* ✅ Lien visible uniquement pour le gérant */}
+            {role === "gerant" && (
+              <Link to="/produits" className="text-dark text-decoration-none text-nowrap">
+                Importer Produits
+              </Link>
+            )}
+
+            {/* ✅ Liste de courses masquée pour le gérant */}
+            {role !== "gerant" && (
+              <Link to="/liste-courses" className="text-dark text-decoration-none text-nowrap">
+                Liste de courses
+              </Link>
+            )}
           </Col>
 
           {/* Profil + Panier */}
