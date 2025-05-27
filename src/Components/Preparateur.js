@@ -23,23 +23,30 @@ export default function GestionCommandes() {
   }, []);
 
   const changerStatut = (commandeId, nouveauStatut) => {
-    const preparateurId = localStorage.getItem("preparateurId");
+    const preparateurId = parseInt(localStorage.getItem("preparateurId"));
 
     if (nouveauStatut === "En cours de traitement") {
+      if (!preparateurId || isNaN(preparateurId)) {
+        console.error("preparateurId invalide ou manquant dans le localStorage");
+        return;
+      }
+
       axios
         .put("http://localhost:8080/commandes/traiter", {
           commandeId,
           preparateurId,
         })
         .then(() => majCommandeLocalement(commandeId, nouveauStatut))
-        .catch((err) => console.error(err));
+        .catch((err) => console.error("Erreur lors du traitement :", err));
     } else if (nouveauStatut === "Traité") {
       axios
         .put("http://localhost:8080/commandes/marquerTraitee", {
           commandeId,
         })
         .then(() => majCommandeLocalement(commandeId, nouveauStatut))
-        .catch((err) => console.error(err));
+        .catch((err) => console.error("Erreur lors de la finalisation :", err));
+
+
     } else if (nouveauStatut === "Annulée") {
       majCommandeLocalement(commandeId, nouveauStatut);
     }
@@ -195,5 +202,3 @@ export default function GestionCommandes() {
     </div>
   );
 }
-
-

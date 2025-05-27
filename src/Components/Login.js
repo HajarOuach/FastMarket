@@ -76,14 +76,15 @@ export default function Login({ onLogin }) {
           }
           break;
 
-        case "preparateur":
-          const magasinPrepId = details.magasin?.id;
-          console.log("Login préparateur – magasin ID :", magasinPrepId);
-          if (magasinPrepId) {
-            localStorage.setItem("magasinId", magasinPrepId.toString());
-          }
-          navigate("/preparateur");
-          break;
+          case "preparateur":
+            const magasinPrepId = details.magasin?.id;
+            if (magasinPrepId) {
+              localStorage.setItem("magasinId", magasinPrepId.toString());
+            }
+            
+            localStorage.setItem("preparateurId", details.id.toString());
+            navigate("/preparateur");
+            break;
 
         case "gerant":
           navigate("/gerant");
