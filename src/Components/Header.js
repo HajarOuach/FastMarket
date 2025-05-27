@@ -10,7 +10,7 @@ function Header({ onLogout }) {
 
   const handleLogout = () => {
     if (onLogout) onLogout();
-    navigate('/toto', { state: { user } });
+    navigate('/', { state: { user } });
   };
 
   const handleLoginClick = () => {
