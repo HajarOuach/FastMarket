@@ -15,7 +15,7 @@ function Header({ onLogout }) {
   const handleLogout = () => {
     if (onLogout) onLogout();
     setShowMenu(false);
-    navigate('/toto', { state: { user } });
+    navigate('/', { state: { user } });
   };
 
   const handleLoginClick = () => {

@@ -1,119 +1,228 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import axios from "axios";
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { Toast, ToastContainer, Button, Form, Card } from 'react-bootstrap';
+import Header from './Header'; // Assurez-vous que le chemin est correct
 
 export default function ListeCourseDetails() {
   const { listeId } = useParams();
-  const [listeDetails, setListeDetails] = useState(null);
-  const [nouveauPostIt, setNouveauPostIt] = useState("");
-  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const [details, setDetails] = useState(null);
+  const [postItInput, setPostItInput] = useState('');
+  const [editingPostItId, setEditingPostItId] = useState(null);
+  const [editingContent, setEditingContent] = useState('');
+  const [toast, setToast] = useState({ show: false, message: '', bg: 'success' });
 
-  useEffect(() => {
-    if (!listeId) return;
+  const client = JSON.parse(localStorage.getItem("client"));
+  const clientId = client?.id;
 
+  const fetchDetails = () => {
     axios
       .get(`http://localhost:8080/listesCourses/${listeId}/details`)
-      .then((res) => {
-        setListeDetails(res.data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Erreur chargement détails :", err);
-        setLoading(false);
-      });
+      .then((res) => setDetails(res.data))
+      .catch((err) => console.error(err));
+  };
+
+  useEffect(() => {
+    fetchDetails();
   }, [listeId]);
 
-  const handleAddPostIt = async () => {
-    if (!nouveauPostIt.trim()) return;
+  const showToast = (message, bg = 'success') => {
+    setToast({ show: true, message, bg });
+    setTimeout(() => setToast({ show: false, message: '', bg: 'success' }), 3000);
+  };
+
+  const handleAddPostIt = () => {
+    if (!postItInput.trim()) return;
+    axios
+      .post(`http://localhost:8080/listesCourses/${listeId}/postits`, { contenu: postItInput })
+      .then(() => {
+        showToast('Post-it ajouté');
+        setPostItInput('');
+        fetchDetails();
+      })
+      .catch(() => showToast("Erreur d'ajout", 'danger'));
+  };
+
+  const handleDeletePostIt = (postItId) => {
+    axios
+      .delete(`http://localhost:8080/listesCourses/${listeId}/postits/${postItId}`)
+      .then(() => {
+        showToast('Post-it supprimé');
+        fetchDetails();
+      })
+      .catch(() => showToast("Erreur suppression", 'danger'));
+  };
+
+  const handleEditPostIt = (postItId, contenu) => {
+    setEditingPostItId(postItId);
+    setEditingContent(contenu);
+  };
+
+  const handleUpdatePostIt = () => {
+    axios
+      .put(`http://localhost:8080/postits/${editingPostItId}`, { contenu: editingContent })
+      .then(() => {
+        showToast('Post-it modifié');
+        setEditingPostItId(null);
+        setEditingContent('');
+        fetchDetails();
+      })
+      .catch(() => showToast("Erreur modification", 'danger'));
+  };
+
+  const handleDeleteProduit = (produitId) => {
+    axios
+      .delete(`http://localhost:8080/listesCourses/${listeId}/produits/${produitId}`)
+      .then(() => {
+        showToast('Produit supprimé');
+        fetchDetails();
+      })
+      .catch(() => showToast("Erreur suppression produit", 'danger'));
+  };
+
+  const handleAjouterTousAuPanier = async () => {
+    if (!clientId || !details || !details.produits.length) return;
 
     try {
-      await axios.post(`http://localhost:8080/listesCourses/${listeId}/postits`, {
-        contenu: nouveauPostIt,
-      });
-      const updated = await axios.get(
-        `http://localhost:8080/listesCourses/${listeId}/details`
+      await Promise.all(
+        details.produits.map((produit) =>
+          axios.post("http://localhost:8080/panier/ajouter", {
+            clientId,
+            produitId: produit.id,
+            quantite: 1,
+          })
+        )
       );
-      setListeDetails(updated.data);
-      setNouveauPostIt("");
-    } catch (err) {
-      console.error("Erreur ajout post-it :", err);
+      showToast('Tous les produits ont été ajoutés au panier');
+    } catch (error) {
+      console.error(error);
+      showToast('Erreur lors de l’ajout au panier', 'danger');
     }
   };
 
-  if (loading) {
-    return <div className="text-center mt-5">Chargement...</div>;
-  }
-
-  if (!listeDetails) {
-    return <div className="text-center mt-5 text-danger">Aucune donnée trouvée.</div>;
-  }
-
-  // Éliminer les doublons de produits par leur ID
-  const produitsUniques = listeDetails.produits.filter(
-    (p, index, self) => index === self.findIndex((t) => t.id === p.id)
-  );
+  if (!details) return <p className="text-center mt-5">Chargement...</p>;
 
   return (
-    <div className="container mt-4">
-      <h3 className="text-center mb-4">{listeDetails.nom}</h3>
+    <>
+      <Header />
+      <div className="container mt-4">
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <h2 className="mb-0">Liste : {details.nom}</h2>
+          <Button variant="outline-primary" onClick={() => navigate('/liste-courses')}>
+            Retour aux listes
+          </Button>
+        </div>
 
-      <h5>Produits dans la liste</h5>
-      <div className="row mb-4">
-        {produitsUniques.length === 0 ? (
-          <p className="text-muted">Aucun produit.</p>
-        ) : (
-          produitsUniques.map((produit) => (
-            <div key={produit.id} className="col-md-3 mb-3">
-              <div className="card h-100 text-center shadow-sm">
-                <img
-                  src={produit.image}
-                  alt={produit.libelle}
-                  className="card-img-top p-3"
-                  style={{ height: "140px", objectFit: "contain" }}
+        {/* Post-Its */}
+        <div className="mb-5">
+          <h4>Post-its</h4>
+          <div className="row">
+            {/* Carte de création */}
+            <div className="col-md-3 mb-3">
+              <Card className="bg-light p-2 shadow-sm">
+                <Form.Control
+                  type="text"
+                  placeholder="Contenu du post-it"
+                  value={postItInput}
+                  onChange={(e) => setPostItInput(e.target.value)}
+                  className="mb-2"
                 />
-                <div className="card-body">
-                  <h6 className="card-title">{produit.libelle}</h6>
-                  {produit.marque && (
-                    <p className="mb-1 text-muted" style={{ fontSize: "0.85rem" }}>
-                      Marque : {produit.marque}
-                    </p>
-                  )}
-                  <p className="fw-bold">{produit.prixUnitaire.toFixed(2)} €</p>
-                  {produit.enPromotion && (
-                    <span className="badge bg-success">Promo</span>
-                  )}
-                </div>
-              </div>
+                <Button variant="success" onClick={handleAddPostIt}>
+                  Ajouter
+                </Button>
+              </Card>
             </div>
-          ))
-        )}
-      </div>
 
-      <h5>Post-its</h5>
-      <ul className="list-group mb-3">
-        {listeDetails.postIts.length === 0 ? (
-          <p className="text-muted">Aucun post-it.</p>
-        ) : (
-          listeDetails.postIts.map((p) => (
-            <li key={p.id} className="list-group-item">
-              {p.contenu}
-            </li>
-          ))
-        )}
-      </ul>
+            {/* Cartes post-it existants */}
+            {details.postIts.map((p) => (
+              <div key={p.id} className="col-md-3 mb-3">
+                <Card className="bg-warning-subtle p-2 shadow-sm">
+                  {editingPostItId === p.id ? (
+                    <>
+                      <Form.Control
+                        type="text"
+                        value={editingContent}
+                        onChange={(e) => setEditingContent(e.target.value)}
+                        className="mb-2"
+                      />
+                      <div className="d-flex justify-content-between">
+                        <Button size="sm" variant="success" onClick={handleUpdatePostIt}>
+                          Sauvegarder
+                        </Button>
+                        <Button size="sm" variant="secondary" onClick={() => setEditingPostItId(null)}>
+                          Annuler
+                        </Button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <Card.Text className="mb-2">{p.contenu}</Card.Text>
+                      <div className="d-flex justify-content-between">
+                        <Button size="sm" variant="outline-primary" onClick={() => handleEditPostIt(p.id, p.contenu)}>
+                          Modifier
+                        </Button>
+                        <Button size="sm" variant="outline-danger" onClick={() => handleDeletePostIt(p.id)}>
+                          Supprimer
+                        </Button>
+                      </div>
+                    </>
+                  )}
+                </Card>
+              </div>
+            ))}
+          </div>
+        </div>
 
-      <div className="d-flex gap-2">
-        <input
-          type="text"
-          placeholder="Ajouter un post-it..."
-          className="form-control"
-          value={nouveauPostIt}
-          onChange={(e) => setNouveauPostIt(e.target.value)}
-        />
-        <button className="btn btn-primary" onClick={handleAddPostIt}>
-          Ajouter
-        </button>
+        {/* Produits */}
+        <h4 className="mb-3">Produits</h4>
+        <div className="row">
+          {details.produits.length === 0 ? (
+            <p className="text-center text-muted">Aucun produit dans cette liste.</p>
+          ) : (
+            details.produits.map((produit) => (
+              <div key={produit.id} className="col-md-3 mb-4">
+                <Card className="h-100 shadow-sm">
+                  <Card.Img
+                    variant="top"
+                    src={produit.image}
+                    alt={produit.libelle}
+                    style={{ objectFit: 'contain', height: '180px' }}
+                  />
+                  <Card.Body className="d-flex flex-column">
+                    <Card.Title>{produit.libelle}</Card.Title>
+                    <Card.Text>{produit.prixUnitaire.toFixed(2)} €</Card.Text>
+                    <Button
+                      variant="outline-danger"
+                      size="sm"
+                      className="mt-auto"
+                      onClick={() => handleDeleteProduit(produit.id)}
+                    >
+                      Supprimer
+                    </Button>
+                  </Card.Body>
+                </Card>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Ajouter au panier en bas */}
+        {details.produits.length > 0 && (
+          <div className="text-end mt-4 mb-5">
+            <Button variant="success" onClick={handleAjouterTousAuPanier}>
+              Ajouter tous les produits au panier
+            </Button>
+          </div>
+        )}
+
+        {/* Toast */}
+        <ToastContainer position="top-center">
+          <Toast bg={toast.bg} show={toast.show} onClose={() => setToast({ ...toast, show: false })}>
+            <Toast.Body>{toast.message}</Toast.Body>
+          </Toast>
+        </ToastContainer>
       </div>
-    </div>
+    </>
   );
 }
