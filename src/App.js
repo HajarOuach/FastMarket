@@ -73,7 +73,12 @@ function App() {
           ) : <Navigate to="/login" />
         } />
 
-        <Route path="/accueil-magasin/:id" element={<AccueilMagasin />} />
+        <Route path="/accueil-magasin/:id" element={
+          <>
+            <Header onLogout={handleLogout} />
+            <AccueilMagasin />
+          </>
+        } />
 
         <Route path="/gerant" element={
           user?.role === "gerant" ? (
@@ -129,9 +134,18 @@ function App() {
           ) : <Navigate to={`/login?role=client`} />
         } />
 
-        <Route path="/liste-courses/:listeId/details/" element={<ListeCourseDetails />} />
+        <Route path="/liste-courses/:listeId/details/" element={
+          <>
+            <Header onLogout={handleLogout} />
+            <ListeCourseDetails />
+          </>
+        } />
 
-        <Route path="/choix-magasin" element={<ChoixMagasin />} />
+        <Route path="/choix-magasin" element={
+          <>
+            <ChoixMagasin />
+          </>
+        } />
       </Routes>
     </>
   );
