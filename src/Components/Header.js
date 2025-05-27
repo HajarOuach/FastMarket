@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Container, Row, Col, Dropdown } from 'react-bootstrap';
+import { Container, Row, Col, Dropdown, Form, FormControl } from 'react-bootstrap';
 import SearchBar from './SearchBar'; // ← Import du nouveau composant
 
 function Header({ onLogout }) {

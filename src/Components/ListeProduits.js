@@ -61,9 +61,6 @@ export default function ListeProduits() {
     }
   };
 
-
-  const handleDetail = (produit) => setSelectedProduit(produit);
-
   const handleClose = () => setSelectedProduit(null);
 
   const increaseQuantity = (id) =>
