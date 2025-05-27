@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Modal, Button, Form } from "react-bootstrap";
 import axios from "axios";
+import { propTypes } from "react-bootstrap/esm/Image";
 
 export default function ListeProduits() {
+  const navigate = useNavigate();
   const [produits, setProduits] = useState([]);
   const [produitsLoaded, setProduitsLoaded] = useState(false);
   const [selectedProduit, setSelectedProduit] = useState(null);
@@ -68,7 +70,8 @@ export default function ListeProduits() {
 
   const handleAjouter = async (produitId) => {
     if (!clientId) {
-      alert("Veuillez vous connecter pour ajouter un produit.");
+      if (window.confirm("Vous n'êtes pas connecté. Veuillez vous connecter pour ajouter des produits au panier."))
+          navigate("/");
       return;
     }
 
@@ -93,6 +96,11 @@ export default function ListeProduits() {
   };
 
   const openListeModal = (produit) => {
+    if (!clientId) {
+      if (window.confirm("Vous n'êtes pas connecté. Veuillez vous connecter pour ajouter des produits au panier."))
+          navigate("/");
+      return;
+    }
     setProduitToAdd(produit);
     setSelectedListeId(null);
     setShowListeModal(true);

@@ -17,13 +17,22 @@ function Header({ onLogout }) {
     navigate('/');
   };
 
+  const handleGoToListeCourses = () => {
+    if (window.confirm("Vous n'êtes pas connecté. Veuillez vous connecter pour ajouter des produits au panier."))
+      {
+        navigate("/");
+        return;
+      }
+    navigate("/liste-courses");
+  }
+
   return (
     <>
       <header className="py-2 border-bottom bg-white shadow-sm">
         <Container fluid>
           <Row className="align-items-center gx-3">
             {/* Logo */}
-            <Col xs={6} lg={2}>
+            <Col xs={6} lg={1}>
               <Link to={`/accueil-magasin/${magasinId}`} className="text-decoration-none">
                 <img
                   src="/images/LogoMarket2 (2).png"
@@ -35,7 +44,7 @@ function Header({ onLogout }) {
             </Col>
 
             {/* Barre de recherche */}
-            <Col xs={12} lg={5}>
+            <Col xs={12} lg={4}>
               <Form className="d-flex bg-light rounded-pill px-3 py-2 shadow-sm align-items-center">
                 <FormControl
                   type="search"
@@ -46,10 +55,10 @@ function Header({ onLogout }) {
             </Col>
 
             {/* Liens de navigation */}
-            <Col lg={3} className="d-none d-lg-flex justify-content-center gap-3 fw-semibold text-uppercase small">
+            <Col lg={5} className="d-none d-sm-flex justify-content-center gap-3 fw-semibold text-uppercase small">
               <Link to={`/accueil-magasin/${magasinId}`} className="text-decoration-none text-dark">Home</Link>
               <Link to="/catalogue" className="text-dark text-decoration-none">Catégories</Link>
-              <Link to="/liste-courses" className="text-dark text-decoration-none">Liste de courses</Link>
+              <a href="" onClick={handleGoToListeCourses} className="text-dark text-decoration-none">Liste de courses</a>
             </Col>
 
             {/* Profil + Panier */}
