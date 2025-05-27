@@ -120,6 +120,78 @@ export default function GestionCommandes() {
           </div>
         </div>
       )}
+
+<style jsx>{`
+        .container {
+          padding: 2rem;
+        }
+        .title {
+          font-size: 2rem;
+          font-weight: bold;
+          margin-bottom: 2rem;
+        }
+        .commande-table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+        .commande-table th,
+        .commande-table td {
+          border: 1px solid #ccc;
+          padding: 0.5rem;
+          text-align: center;
+        }
+        .actions {
+          display: flex;
+          gap: 0.5rem;
+          justify-content: center;
+        }
+        .btn {
+          padding: 0.5rem 1rem;
+          border-radius: 6px;
+          border: none;
+          cursor: pointer;
+          color: white;
+          font-weight: bold;
+        }
+        .btn.yellow {
+          background-color: #facc15;
+        }
+        .btn.green {
+          background-color: #22c55e;
+        }
+        .btn.blue {
+          background-color: #3b82f6;
+        }
+        .btn.red {
+          background-color: #ef4444;
+        }
+        .popup-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.6);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .popup {
+          background: white;
+          padding: 2rem;
+          border-radius: 12px;
+          max-width: 400px;
+          width: 100%;
+        }
+        .popup ul {
+          margin-top: 1rem;
+          list-style: none;
+          padding: 0;
+        }
+        .popup li {
+          margin-bottom: 0.5rem;
+        }
+      `}</style>
     </div>
   );
 }
