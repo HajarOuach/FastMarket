@@ -10,6 +10,7 @@ export default function ListeProduits() {
   const [produitsLoaded, setProduitsLoaded] = useState(false);
   const [selectedProduit, setSelectedProduit] = useState(null);
   const [quantities, setQuantities] = useState({});
+
   const [showListeModal, setShowListeModal] = useState(false);
   const [listesCourses, setListesCourses] = useState([]);
   const [selectedListeId, setSelectedListeId] = useState(null);
@@ -47,16 +48,22 @@ export default function ListeProduits() {
       });
   }, [selectedCategorie, magasinId]);
 
-  useEffect(() => {
-    if (clientId) {
-      axios
-        .get(`http://localhost:8080/listesCourses/client/${clientId}`)
-        .then((res) => setListesCourses(res.data))
-        .catch((err) => console.error("Erreur récupération listes :", err));
+  const handleDetail = async (produit) => {
+    try {
+      const res = await axios.get(
+        `http://localhost:8080/produits/${produit.id}/recommandes`
+      );
+      const produitsRecommandes = res.data;
+      setSelectedProduit({ ...produit, produitsRecommandes });
+    } catch (err) {
+      console.error("Erreur chargement recommandations :", err);
+      setSelectedProduit({ ...produit, produitsRecommandes: [] });
     }
-  }, [clientId]);
+  };
+
 
   const handleDetail = (produit) => setSelectedProduit(produit);
+
   const handleClose = () => setSelectedProduit(null);
 
   const increaseQuantity = (id) =>
@@ -240,7 +247,7 @@ export default function ListeProduits() {
       )}
 
       {selectedProduit && (
-        <Modal show onHide={handleClose} centered>
+        <Modal show onHide={handleClose} centered size="lg">
           <Modal.Header closeButton>
             <Modal.Title>{selectedProduit.libelle}</Modal.Title>
           </Modal.Header>
@@ -249,10 +256,7 @@ export default function ListeProduits() {
               src={selectedProduit.image}
               alt={selectedProduit.libelle}
               className="img-fluid mb-3"
-              style={{
-                maxHeight: "200px",
-                objectFit: "contain",
-              }}
+              style={{ maxHeight: "200px", objectFit: "contain" }}
             />
             <p className="mt-3">
               <strong>Prix :</strong> {selectedProduit.prixUnitaire.toFixed(2)} €<br />
@@ -267,6 +271,63 @@ export default function ListeProduits() {
                 </>
               )}
             </p>
+
+            {selectedProduit.produitsRecommandes?.length > 0 && (
+              <div className="mt-4">
+                <h5 className="fw-bold text-center mt-4 mb-3">Produits recommandés :</h5>
+                <div className="row">
+                  {selectedProduit.produitsRecommandes.map((rec) => (
+                    <div key={rec.id} className="col-md-4 mb-3">
+                      <div className="card shadow-sm p-2 text-center">
+                        <img
+                          src={rec.image}
+                          alt={rec.libelle}
+                          style={{ maxHeight: "120px", objectFit: "contain" }}
+                          className="mb-2"
+                        />
+                        <h6 className="fw-bold" style={{ fontSize: "0.9rem" }}>
+                          {rec.libelle}
+                        </h6>
+                        <div className="fw-bold mb-1">{rec.prixUnitaire.toFixed(2)} €</div>
+
+                        <div className="d-flex justify-content-center align-items-center gap-2 mb-2">
+                          <button
+                            className="btn btn-warning btn-sm"
+                            onClick={() =>
+                              setQuantities((prev) => ({
+                                ...prev,
+                                [rec.id]: Math.max(1, (prev[rec.id] || 1) - 1),
+                              }))
+                            }
+                          >
+                            –
+                          </button>
+                          <span>{quantities[rec.id] || 1}</span>
+                          <button
+                            className="btn btn-warning btn-sm"
+                            onClick={() =>
+                              setQuantities((prev) => ({
+                                ...prev,
+                                [rec.id]: (prev[rec.id] || 1) + 1,
+                              }))
+                            }
+                          >
+                            +
+                          </button>
+                        </div>
+
+                        <button
+                          className="btn btn-success btn-sm w-100"
+                          onClick={() => handleAjouter(rec.id)}
+                        >
+                          <i className="bi bi-cart-plus me-1"></i> Ajouter au panier
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={handleClose}>
