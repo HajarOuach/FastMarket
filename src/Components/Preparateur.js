@@ -121,7 +121,7 @@ export default function GestionCommandes() {
         </div>
       )}
 
-<style jsx>{`
+      <style jsx>{`
         .container {
           padding: 2rem;
         }
