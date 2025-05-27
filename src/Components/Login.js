@@ -35,7 +35,7 @@ export default function Login({ onLogin }) {
         return;
       }
 
-      // Récupération de l'ID en fonction du rôle
+      // Récupération des détails en fonction du rôle
       let apiUrl = "";
       switch (utilisateur.role) {
         case "client":
@@ -63,30 +63,37 @@ export default function Login({ onLogin }) {
       localStorage.setItem("client", JSON.stringify(userWithId));
       if (onLogin) onLogin(userWithId);
 
-      // ✅ Redirection correcte vers /accueil-magasin/{id}
+      // 🔁 Stockage du magasinId selon le rôle
       switch (utilisateur.role) {
         case "client":
-          const magasinId = details.magasin?.id;
-          console.log(" Login ID du magasin :", magasinId);
-          localStorage.setItem("magasinId", magasinId ? magasinId.toString() : ""); 
-          if (magasinId) {
-            navigate(`/accueil-magasin/${magasinId}`);
+          const magasinIdClient = details.magasin?.id;
+          console.log("Login client – magasin ID :", magasinIdClient);
+          localStorage.setItem("magasinId", magasinIdClient ? magasinIdClient.toString() : "");
+          if (magasinIdClient) {
+            navigate(`/accueil-magasin/${magasinIdClient}`);
           } else {
             navigate("/accueil-magasin");
           }
           break;
+
         case "preparateur":
+          const magasinPrepId = details.magasin?.id;
+          console.log("Login préparateur – magasin ID :", magasinPrepId);
+          if (magasinPrepId) {
+            localStorage.setItem("magasinId", magasinPrepId.toString());
+          }
           navigate("/preparateur");
           break;
+
         case "gerant":
           navigate("/gerant");
           break;
+
         default:
           navigate("/");
       }
     } catch (error) {
       console.error("Erreur lors de la connexion :", error);
-      setErrorMessage("Erreur réseau ou serveur.");
       setErrorMessage("Erreur réseau ou serveur.");
     }
   };
@@ -102,7 +109,6 @@ export default function Login({ onLogin }) {
     <div className="container d-flex justify-content-center align-items-center min-vh-100">
       <div className="row border rounded-5 p-3 bg-white shadow box-area" style={{ width: "400px" }}>
         <h3 className="text-center mb-4">Connexion {expectedRole ? `(${expectedRole})` : ""}</h3>
-        
 
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
@@ -132,7 +138,6 @@ export default function Login({ onLogin }) {
           {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
 
           <div className="d-grid mb-2">
-            
             <button type="submit" className="btn btn-primary">Se connecter</button>
           </div>
         </form>

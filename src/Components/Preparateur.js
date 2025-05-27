@@ -6,18 +6,30 @@ export default function GestionCommandes() {
   const [commandeActive, setCommandeActive] = useState(null);
 
   useEffect(() => {
+    const magasinId = localStorage.getItem("magasinId");
+
+    if (!magasinId) {
+      console.error("Magasin ID introuvable dans le localStorage.");
+      return;
+    }
+
     axios
-      .get("http://localhost:8080/commandes/preparateur/32/commandes/commandees")
-      .then((res) => setCommandes(res.data))
-      .catch((err) => console.error("Erreur lors du chargement :", err));
+      .get(`http://localhost:8080/commandes/magasin/${magasinId}/commandes/commandees`)
+      .then((res) => {
+        console.log("Commandes récupérées :", res.data);
+        setCommandes(res.data);
+      })
+      .catch((err) => console.error("Erreur lors de la récupération :", err));
   }, []);
 
   const changerStatut = (commandeId, nouveauStatut) => {
+    const preparateurId = localStorage.getItem("preparateurId");
+
     if (nouveauStatut === "En cours de traitement") {
       axios
         .put("http://localhost:8080/commandes/traiter", {
           commandeId,
-          preparateurId: 32,
+          preparateurId,
         })
         .then(() => majCommandeLocalement(commandeId, nouveauStatut))
         .catch((err) => console.error(err));
@@ -29,7 +41,6 @@ export default function GestionCommandes() {
         .then(() => majCommandeLocalement(commandeId, nouveauStatut))
         .catch((err) => console.error(err));
     } else if (nouveauStatut === "Annulée") {
-      // Pas encore de route côté back, on l'actualise seulement en local
       majCommandeLocalement(commandeId, nouveauStatut);
     }
   };
@@ -100,7 +111,7 @@ export default function GestionCommandes() {
             <ul>
               {commandeActive.lignesCommande.map((ligne) => (
                 <li key={ligne.id}>
-                  Produit : <strong>{ligne.produit?.libelle}</strong> <br></br> 
+                  Produit : <strong>{ligne.produit?.libelle}</strong> <br />
                   Quantité : <strong>{ligne.quantite}</strong>
                 </li>
               ))}
@@ -109,91 +120,8 @@ export default function GestionCommandes() {
           </div>
         </div>
       )}
-
-      <style jsx>{`
-        .container {
-          padding: 2rem;
-        }
-
-        .title {
-          font-size: 2rem;
-          font-weight: bold;
-          margin-bottom: 2rem;
-        }
-
-        .commande-table {
-          width: 100%;
-          border-collapse: collapse;
-        }
-
-        .commande-table th,
-        .commande-table td {
-          border: 1px solid #ccc;
-          padding: 0.5rem;
-          text-align: center;
-        }
-
-        .actions {
-          display: flex;
-          gap: 0.5rem;
-          justify-content: center;
-        }
-
-        .btn {
-          padding: 0.5rem 1rem;
-          border-radius: 6px;
-          border: none;
-          cursor: pointer;
-          color: white;
-          font-weight: bold;
-        }
-
-        .btn.yellow {
-          background-color: #facc15;
-        }
-
-        .btn.green {
-          background-color: #22c55e;
-        }
-
-        .btn.blue {
-          background-color: #3b82f6;
-        }
-
-        .btn.red {
-          background-color: #ef4444;
-        }
-
-        .popup-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background-color: rgba(0, 0, 0, 0.6);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .popup {
-          background: white;
-          padding: 2rem;
-          border-radius: 12px;
-          max-width: 400px;
-          width: 100%;
-        }
-
-        .popup ul {
-          margin-top: 1rem;
-          list-style: none;
-          padding: 0;
-        }
-
-        .popup li {
-          margin-bottom: 0.5rem;
-        }
-      `}</style>
     </div>
   );
 }
+
+
