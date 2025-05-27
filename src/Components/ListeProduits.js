@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { Modal, Button } from "react-bootstrap";
+import { Modal, Button, Form } from "react-bootstrap";
 import axios from "axios";
 
 export default function ListeProduits() {
@@ -8,6 +8,10 @@ export default function ListeProduits() {
   const [produitsLoaded, setProduitsLoaded] = useState(false);
   const [selectedProduit, setSelectedProduit] = useState(null);
   const [quantities, setQuantities] = useState({});
+  const [showListeModal, setShowListeModal] = useState(false);
+  const [listesCourses, setListesCourses] = useState([]);
+  const [selectedListeId, setSelectedListeId] = useState(null);
+  const [produitToAdd, setProduitToAdd] = useState(null);
 
   const location = useLocation();
   const params = new URLSearchParams(location.search);
@@ -28,8 +32,7 @@ export default function ListeProduits() {
         const filtered = selectedCategorie
           ? allProduits.filter(
               (p) =>
-                p.categorie?.nom?.toLowerCase() ===
-                selectedCategorie.toLowerCase()
+                p.categorie?.nom?.toLowerCase() === selectedCategorie.toLowerCase()
             )
           : allProduits;
 
@@ -41,6 +44,15 @@ export default function ListeProduits() {
         setProduitsLoaded(true);
       });
   }, [selectedCategorie, magasinId]);
+
+  useEffect(() => {
+    if (clientId) {
+      axios
+        .get(`http://localhost:8080/listesCourses/client/${clientId}`)
+        .then((res) => setListesCourses(res.data))
+        .catch((err) => console.error("Erreur récupération listes :", err));
+    }
+  }, [clientId]);
 
   const handleDetail = (produit) => setSelectedProduit(produit);
   const handleClose = () => setSelectedProduit(null);
@@ -80,11 +92,31 @@ export default function ListeProduits() {
     }
   };
 
+  const openListeModal = (produit) => {
+    setProduitToAdd(produit);
+    setSelectedListeId(null);
+    setShowListeModal(true);
+  };
+
+  const handleAddToListe = async () => {
+    if (!selectedListeId || !produitToAdd) return;
+    try {
+      await axios.post(`http://localhost:8080/listesCourses/${selectedListeId}/produits`, {
+        produitId: produitToAdd.id,
+      });
+      alert("Produit ajouté à la liste !");
+      setShowListeModal(false);
+    } catch (err) {
+      console.error("Erreur ajout produit à la liste :", err);
+      alert("Erreur lors de l'ajout.");
+    }
+  };
+
   return (
     <div className="container mt-5">
       <h2 className="text-center mb-4">
         {selectedCategorie
-          ? `Produits – ${selectedCategorie}`
+          ? selectedCategorie
           : "Nos produits disponibles"}
       </h2>
 
@@ -92,7 +124,7 @@ export default function ListeProduits() {
         <p className="text-center">Chargement...</p>
       ) : produits.length === 0 ? (
         <div className="col-12 text-center text-muted">
-          <p>😕 Aucun produit disponible pour cette catégorie ou ce magasin.</p>
+          <p> Aucun produit disponible pour cette catégorie ou ce magasin.</p>
         </div>
       ) : (
         <div className="row">
@@ -110,7 +142,6 @@ export default function ListeProduits() {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      position: "relative",
                     }}
                   >
                     <img
@@ -121,7 +152,6 @@ export default function ListeProduits() {
                         maxWidth: "100%",
                         objectFit: "contain",
                         zIndex: 1,
-                        position: "relative",
                       }}
                     />
                   </div>
@@ -221,17 +251,13 @@ export default function ListeProduits() {
               style={{
                 maxHeight: "200px",
                 objectFit: "contain",
-                position: "relative",
-                zIndex: 1,
               }}
             />
             <p className="mt-3">
-              <strong>Prix :</strong> {selectedProduit.prixUnitaire.toFixed(2)} €
-              <br />
+              <strong>Prix :</strong> {selectedProduit.prixUnitaire.toFixed(2)} €<br />
               {selectedProduit.marque && (
                 <>
-                  <strong>Marque :</strong> {selectedProduit.marque}
-                  <br />
+                  <strong>Marque :</strong> {selectedProduit.marque}<br />
                 </>
               )}
               {selectedProduit.enPromotion && selectedProduit.typePromotion && (
@@ -248,6 +274,36 @@ export default function ListeProduits() {
           </Modal.Footer>
         </Modal>
       )}
+
+      {/* Modal pour ajouter à une liste */}
+      <Modal show={showListeModal} onHide={() => setShowListeModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Ajouter à une liste</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Select
+            value={selectedListeId || ""}
+            onChange={(e) => setSelectedListeId(e.target.value)}
+          >
+            <option value="">-- Choisir une liste --</option>
+            {listesCourses.map((liste) => (
+              <option key={liste.id} value={liste.id}>
+                {liste.nom}
+              </option>
+            ))}
+          </Form.Select>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowListeModal(false)}>
+            Annuler
+          </Button>
+          <Button variant="primary" onClick={handleAddToListe} disabled={!selectedListeId}>
+            Ajouter
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
+
 }
+

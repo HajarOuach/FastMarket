@@ -20,7 +20,7 @@ import PageGerant from './Components/PageGerant';
 import Panier from './Components/Panier';
 import ListeProduits from './Components/ListeProduits';
 import ListeCourses from './Components/ListeCourses';
-
+import ListeCourseDetails from "./Components/ListeCourseDetails";
 
 function App() {
   const location = useLocation();
@@ -128,6 +128,8 @@ function App() {
             </>
           ) : <Navigate to={`/login?role=client`} />
         } />
+
+        <Route path="/liste-courses/:listeId/details/" element={<ListeCourseDetails />} />
 
         <Route path="/choix-magasin" element={<ChoixMagasin />} />
       </Routes>
