@@ -49,7 +49,7 @@ const ChoixMagasin = () => {
 
         // 2. Recharge les données du client pour récupérer le magasin mis à jour
         const updatedClient = await axios.get(`http://localhost:8080/clients/${client.id}`);
-        localStorage.setItem("client", JSON.stringify(updatedClient.data));
+        localStorage.setItem("client", JSON.stringify({...updatedClient.data, role: "client"}));
       }
 
       // 3. Stocke les infos utiles
