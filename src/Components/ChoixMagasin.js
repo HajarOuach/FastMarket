@@ -32,21 +32,25 @@ const ChoixMagasin = () => {
 
   const handleCommander = async () => {
     const client = JSON.parse(localStorage.getItem("client"));
-    if (!client || !client.id || !selectedMagasin || !selectedCreneau) {
+    if (!client || !selectedMagasin || !selectedCreneau) {
       alert("Veuillez sélectionner un magasin et un créneau.");
       return;
     }
 
+    
+
     try {
       // 1. Met à jour le magasin du client
-      await axios.put("http://localhost:8080/clients/modifierMagasin", {
-        clientId: client.id,
-        magasinId: selectedMagasin.id
-      });
+      if (client.id) {
+        await axios.put("http://localhost:8080/clients/modifierMagasin", {
+          clientId: client.id,
+          magasinId: selectedMagasin.id
+        });
 
-      // 2. Recharge les données du client pour récupérer le magasin mis à jour
-      const updatedClient = await axios.get(`http://localhost:8080/clients/${client.id}`);
-      localStorage.setItem("client", JSON.stringify(updatedClient.data));
+        // 2. Recharge les données du client pour récupérer le magasin mis à jour
+        const updatedClient = await axios.get(`http://localhost:8080/clients/${client.id}`);
+        localStorage.setItem("client", JSON.stringify(updatedClient.data));
+      }
 
       // 3. Stocke les infos utiles
       localStorage.setItem("magasinId", selectedMagasin.id.toString());

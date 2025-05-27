@@ -51,12 +51,15 @@ function App() {
 
   if (user && !user.role) handleLogout(); // Si le user n'a pas de rôle, on le déconnecte
 
+  const magasinStorage = JSON.parse(localStorage.getItem("magasin")); // au cas où seul l'id est stocké
+  const magasinId = user?.magasin?.id || magasinStorage?.id || magasinStorage;
+
   return (
     <>
       <Routes>
         <Route path="/" element={
           user ? (
-            user.role === "client" ? <Navigate to="/acceuil-magasin" /> :
+            user.role === "client" ? <Navigate to={`/accueil-magasin/${magasinId}`} /> :
             user.role === "gerant" ? <Navigate to="/gerant" /> :
             user.role === "preparateur" ? <Navigate to="/preparateur" /> :
             <ChoixProfil />
