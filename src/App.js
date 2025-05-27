@@ -72,7 +72,7 @@ function App() {
               <HeroSection />
               <Categories />
             </>
-          ) : <Navigate to="/login" />
+          ) : <Navigate to="/" />
         } />
 
         <Route path="/accueil-magasin/:id" element={
