@@ -20,13 +20,16 @@ export default function PageGerant() {
 
   return (
     <div className="container mt-5">
-      {/* ✅ Ajout de la prop role ici */}
-      <HeroSection nomMagasin={magasin?.nom} role="gerant" />
+      <HeroSection
+        nomMagasin={magasin?.nom}
+        role="gerant"
+        nomGerant={magasin?.gerant?.nom}
+      />
 
       {magasin?.id ? (
         <>
           <PromotionsParMagasin magasinId={magasin.id} />
-          <BestSellings magasinId={magasin.id} /> 
+          <BestSellings magasinId={magasin.id} />
         </>
       ) : (
         <p>Chargement des promotions...</p>
