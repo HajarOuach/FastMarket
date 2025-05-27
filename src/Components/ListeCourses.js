@@ -1,155 +1,177 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button, Form, Modal } from 'react-bootstrap';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { Toast, ToastContainer, Card, Button, Row, Col } from "react-bootstrap";
 
 export default function ListeCourses() {
   const [listes, setListes] = useState([]);
-  const [nouvelleListeNom, setNouvelleListeNom] = useState('');
-  const [editListeId, setEditListeId] = useState(null);
-  const [editListeNom, setEditListeNom] = useState('');
-  const [showModal, setShowModal] = useState(false);
-  const navigate = useNavigate();
+  const [nouvelleListe, setNouvelleListe] = useState("");
+  const [editingId, setEditingId] = useState(null);
+  const [editedName, setEditedName] = useState("");
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
 
   const client = JSON.parse(localStorage.getItem("client"));
   const clientId = client?.id;
-
-  const fetchListes = async () => {
-    try {
-      const res = await fetch(`http://localhost:8080/listesCourses/client/${clientId}`);
-      const data = await res.json();
-      setListes(data);
-    } catch (error) {
-      console.error("Erreur chargement listes :", error);
-    }
-  };
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (clientId) {
-      fetchListes();
+      axios
+        .get(`http://localhost:8080/listesCourses/client/${clientId}`)
+        .then((res) => setListes(res.data))
+        .catch((err) => console.error("Erreur récupération des listes :", err));
     }
   }, [clientId]);
 
-  const handleAjouterListe = async () => {
-    if (!nouvelleListeNom.trim()) return;
+  const creerListe = () => {
+    if (!nouvelleListe.trim()) return;
 
-    try {
-      const res = await fetch("http://localhost:8080/listesCourses/creer", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nom: nouvelleListeNom, clientId }),
-      });
-
-      if (res.ok) {
-        setNouvelleListeNom('');
-        fetchListes();
-      }
-    } catch (err) {
-      console.error("Erreur création liste :", err);
-    }
+    axios
+      .post("http://localhost:8080/listesCourses/creer", {
+        clientId,
+        nom: nouvelleListe,
+      })
+      .then((res) => {
+        setListes((prev) => [...prev, res.data]);
+        setNouvelleListe("");
+        showToast("Liste créée !");
+      })
+      .catch((err) => console.error("Erreur création liste :", err));
   };
 
-  const handleSupprimerListe = async (id) => {
-    try {
-      const res = await fetch(`http://localhost:8080/listesCourses/${id}`, {
-        method: "DELETE",
-      });
+  const supprimerListe = (listeId) => {
+    const confirmation = window.confirm("Voulez-vous vraiment supprimer cette liste de courses ?");
+    if (!confirmation) return;
 
-      if (res.ok) {
-        setListes(prev => prev.filter(l => l.id !== id));
-      }
-    } catch (err) {
-      console.error("Erreur suppression liste :", err);
-    }
+    axios
+      .delete(`http://localhost:8080/listesCourses/${listeId}`)
+      .then(() => {
+        setListes((prev) => prev.filter((l) => l.id !== listeId));
+        showToast("Liste supprimée !");
+      })
+      .catch((err) => console.error("Erreur suppression :", err));
   };
 
-  const handleModifierNom = (id, nom) => {
-    setEditListeId(id);
-    setEditListeNom(nom);
-    setShowModal(true);
+  const voirDetail = (id) => navigate(`/liste-details/${id}`);
+
+  const startEditing = (liste) => {
+    setEditingId(liste.id);
+    setEditedName(liste.nom);
   };
 
-  const handleConfirmerModification = async () => {
-    try {
-      const res = await fetch(`http://localhost:8080/listesCourses/${editListeId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nom: editListeNom }),
-      });
+  const saveEditedName = (listeId) => {
+    if (!editedName.trim()) return;
 
-      if (res.ok) {
-        fetchListes();
-        setShowModal(false);
-        setEditListeId(null);
-        setEditListeNom('');
-      }
-    } catch (err) {
-      console.error("Erreur modification nom :", err);
-    }
+    axios
+      .put(`http://localhost:8080/listesCourses/${listeId}`, {
+        nom: editedName,
+      })
+      .then((res) => {
+        setListes((prev) => prev.map((l) => (l.id === listeId ? res.data : l)));
+        setEditingId(null);
+        setEditedName("");
+        showToast("Nom modifié !");
+      })
+      .catch((err) => console.error("Erreur modification nom :", err));
   };
 
-  const handleVoirDetails = (id) => {
-    navigate(`/liste-courses/${id}`);
+  const showToast = (message) => {
+    setToastMessage(message);
+    setToastVisible(true);
+    setTimeout(() => setToastVisible(false), 3000);
   };
 
   return (
-    <div className="container mt-5">
+    <div className="container mt-4">
       <h2 className="mb-4">Mes listes de courses</h2>
 
-      <div className="mb-3 d-flex gap-2">
-        <Form.Control
+      <div className="input-group mb-4">
+        <input
           type="text"
+          className="form-control"
           placeholder="Nom de la nouvelle liste"
-          value={nouvelleListeNom}
-          onChange={(e) => setNouvelleListeNom(e.target.value)}
+          value={nouvelleListe}
+          onChange={(e) => setNouvelleListe(e.target.value)}
         />
-        <Button variant="primary" onClick={handleAjouterListe}>
-          Ajouter
-        </Button>
+        <button className="btn btn-primary" onClick={creerListe}>
+          Créer
+        </button>
       </div>
 
       {listes.length === 0 ? (
-        <p className="text-muted">Aucune liste trouvée.</p>
+        <p className="text-muted">Aucune liste enregistrée.</p>
       ) : (
-        <ul className="list-group">
+        <Row xs={1} sm={2} md={3} lg={4} className="g-4">
           {listes.map((liste) => (
-            <li key={liste.id} className="list-group-item d-flex justify-content-between align-items-center">
-              <span>{liste.nom}</span>
-              <div className="d-flex gap-2">
-                <Button variant="info" size="sm" onClick={() => handleVoirDetails(liste.id)}>
-                  Voir détails
-                </Button>
-                <Button variant="warning" size="sm" onClick={() => handleModifierNom(liste.id, liste.nom)}>
-                  Modifier
-                </Button>
-                <Button variant="danger" size="sm" onClick={() => handleSupprimerListe(liste.id)}>
-                  Supprimer
-                </Button>
-              </div>
-            </li>
+            <Col key={liste.id}>
+              <Card className="h-100 shadow-sm">
+                <Card.Body>
+                  {editingId === liste.id ? (
+                    <>
+                      <input
+                        className="form-control mb-2"
+                        value={editedName}
+                        onChange={(e) => setEditedName(e.target.value)}
+                      />
+                      <div className="d-flex justify-content-between">
+                        <Button
+                          size="sm"
+                          variant="success"
+                          onClick={() => saveEditedName(liste.id)}
+                        >
+                          Sauvegarder
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline-secondary"
+                          onClick={() => setEditingId(null)}
+                        >
+                          Annuler
+                        </Button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <Card.Title className="fw-bold">{liste.nom}</Card.Title>
+                      <div className="d-flex flex-wrap gap-2 mt-3">
+                        <Button
+                          size="sm"
+                          variant="info"
+                          className="text-white"
+                          onClick={() => startEditing(liste)}
+                        >
+                          Modifier
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => voirDetail(liste.id)}
+                        >
+                          Détail
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="danger"
+                          onClick={() => supprimerListe(liste.id)}
+                        >
+                          Supprimer
+                        </Button>
+                      </div>
+                    </>
+                  )}
+                </Card.Body>
+              </Card>
+            </Col>
           ))}
-        </ul>
+        </Row>
       )}
 
-      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Modifier le nom de la liste</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form.Control
-            type="text"
-            value={editListeNom}
-            onChange={(e) => setEditListeNom(e.target.value)}
-          />
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
-            Annuler
-          </Button>
-          <Button variant="primary" onClick={handleConfirmerModification}>
-            Enregistrer
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <ToastContainer position="top-center" className="p-3" style={{ zIndex: 9999 }}>
+        <Toast bg="success" show={toastVisible} onClose={() => setToastVisible(false)} delay={3000} autohide>
+          <Toast.Body className="text-white">{toastMessage}</Toast.Body>
+        </Toast>
+      </ToastContainer>
     </div>
   );
 }
