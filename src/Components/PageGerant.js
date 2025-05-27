@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import PromotionsParMagasin from "./PromotionsParMagasin";
 import HeroSection from "./HeroSection";
-import BestSellings from "./BestSellings"; // N'oublie pas d'importer
+import BestSellings from "./BestSellings";
 
 export default function PageGerant() {
   const [magasin, setMagasin] = useState(null);
@@ -20,8 +20,8 @@ export default function PageGerant() {
 
   return (
     <div className="container mt-5">
-      <HeroSection nomMagasin={magasin?.nom} />
-      
+      {/* ✅ Ajout de la prop role ici */}
+      <HeroSection nomMagasin={magasin?.nom} role="gerant" />
 
       {magasin?.id ? (
         <>

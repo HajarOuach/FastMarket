@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-function HeroSection({ nomMagasin }) {
+function HeroSection({ nomMagasin, role }) {
   return (
     <section className="py-5 bg-light text-center">
       <div className="container">
@@ -12,9 +12,12 @@ function HeroSection({ nomMagasin }) {
           Découvrez nos meilleures offres sur vos produits préférés !
         </p>
 
-        <Link to="/choix-magasin" className="btn btn-warning btn-lg mt-3">
-          Modifier magasin
-        </Link>
+        {/* ✅ Afficher le bouton sauf si c'est un gérant */}
+        {role !== "gerant" && (
+          <Link to="/choix-magasin" className="btn btn-warning btn-lg mt-3">
+            Modifier magasin
+          </Link>
+        )}
       </div>
     </section>
   );
