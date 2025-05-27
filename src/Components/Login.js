@@ -143,11 +143,14 @@ export default function Login({ onLogin }) {
           </div>
         </form>
 
-        <div className="d-grid">
-          <button onClick={handleVisiteur} className="btn btn-outline-secondary">
-            Continuer en tant que visiteur
-          </button>
-        </div>
+      {expectedRole === "client" && (
+  <div className="d-grid">
+    <button onClick={handleVisiteur} className="btn btn-outline-secondary">
+      Continuer en tant que visiteur
+    </button>
+  </div>
+)}
+
       </div>
     </div>
   );

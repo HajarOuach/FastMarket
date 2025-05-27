@@ -20,6 +20,7 @@ export default function ListeProduits() {
 
   const client = JSON.parse(localStorage.getItem("client"));
   const clientId = client?.id;
+  const isGerant = client?.role === "gerant";
 
   useEffect(() => {
     if (!magasinId) return;
@@ -123,7 +124,7 @@ export default function ListeProduits() {
         <p className="text-center">Chargement...</p>
       ) : produits.length === 0 ? (
         <div className="col-12 text-center text-muted">
-          <p>😕 Aucun produit disponible pour cette catégorie ou ce magasin.</p>
+          <p> Aucun produit disponible pour cette catégorie ou ce magasin.</p>
         </div>
       ) : (
         <div className="row">
@@ -162,48 +163,55 @@ export default function ListeProduits() {
                     {produit.prixUnitaire.toFixed(2)} €
                   </div>
 
-                  <div className="d-flex justify-content-center align-items-center mt-1 mb-1 gap-2">
-                    <button
-                      className="btn btn-warning btn-sm px-2 py-1"
-                      style={{ fontSize: "0.75rem" }}
-                      onClick={() => decreaseQuantity(produit.id)}
-                    >
-                      –
-                    </button>
-                    <span style={{ minWidth: "20px" }}>
-                      {quantities[produit.id] || 1}
-                    </span>
-                    <button
-                      className="btn btn-warning btn-sm px-2 py-1"
-                      style={{ fontSize: "0.75rem" }}
-                      onClick={() => increaseQuantity(produit.id)}
-                    >
-                      +
-                    </button>
-                  </div>
+                  {/* Affichage des boutons uniquement si ce n'est pas un gérant */}
+                  {!isGerant && (
+                    <>
+                      <div className="d-flex justify-content-center align-items-center mt-1 mb-1 gap-2">
+                        <button
+                          className="btn btn-warning btn-sm px-2 py-1"
+                          style={{ fontSize: "0.75rem" }}
+                          onClick={() => decreaseQuantity(produit.id)}
+                        >
+                          –
+                        </button>
+                        <span style={{ minWidth: "20px" }}>
+                          {quantities[produit.id] || 1}
+                        </span>
+                        <button
+                          className="btn btn-warning btn-sm px-2 py-1"
+                          style={{ fontSize: "0.75rem" }}
+                          onClick={() => increaseQuantity(produit.id)}
+                        >
+                          +
+                        </button>
+                      </div>
 
-                  <div className="d-flex justify-content-center gap-2 mt-1">
-                    <button
-                      className="btn btn-success btn-sm"
-                      onClick={() => handleAjouter(produit.id)}
-                    >
-                      <i className="bi bi-cart-plus" /> Panier
-                    </button>
+                      <div className="d-flex justify-content-center gap-2 mt-1">
+                        <button
+                          className="btn px-2 py-1 rounded-pill d-flex align-items-center gap-1"
+                          style={{
+                            fontSize: "0.75rem",
+                            backgroundColor: "#3cb371",
+                            color: "#fff",
+                            border: "none",
+                          }}
+                          onClick={() => handleAjouter(produit.id)}
+                        >
+                          <i className="bi bi-cart-plus" style={{ fontSize: "0.8rem" }}></i>{" "}
+                          Ajouter
+                        </button>
 
-                    <button
-                      className="btn btn-secondary btn-sm"
-                      onClick={() => handleDetail(produit)}
-                    >
-                      <i className="bi bi-info-circle" /> Détail
-                    </button>
-
-                    <button
-                      className="btn btn-outline-primary btn-sm"
-                      onClick={() => openListeModal(produit)}
-                    >
-                      + Liste
-                    </button>
-                  </div>
+                        <button
+                          className="btn btn-outline-secondary px-2 py-1 rounded-pill d-flex align-items-center gap-1"
+                          style={{ fontSize: "0.75rem" }}
+                          onClick={() => handleDetail(produit)}
+                        >
+                          <i className="bi bi-info-circle" style={{ fontSize: "0.8rem" }}></i>{" "}
+                          Détail
+                        </button>
+                      </div>
+                    </>
+                  )}
 
                   {produit.enPromotion && produit.typePromotion && (
                     <div
@@ -230,7 +238,7 @@ export default function ListeProduits() {
         </div>
       )}
 
-      {selectedProduit && (
+      {selectedProduit && !isGerant && (
         <Modal show onHide={handleClose} centered>
           <Modal.Header closeButton>
             <Modal.Title>{selectedProduit.libelle}</Modal.Title>
@@ -296,4 +304,6 @@ export default function ListeProduits() {
       </Modal>
     </div>
   );
+
 }
+
