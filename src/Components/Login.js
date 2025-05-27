@@ -63,7 +63,7 @@ export default function Login({ onLogin }) {
       localStorage.setItem("client", JSON.stringify(userWithId));
       if (onLogin) onLogin(userWithId);
 
-      // 🔁 Stockage du magasinId selon le rôle
+      // Stockage du magasinId selon le rôle
       switch (utilisateur.role) {
         case "client":
           const magasinIdClient = details.magasin?.id;
