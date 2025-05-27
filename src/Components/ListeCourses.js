@@ -53,7 +53,7 @@ export default function ListeCourses() {
       .catch((err) => console.error("Erreur suppression :", err));
   };
 
-  const voirDetail = (id) => navigate(`/liste-details/${id}`);
+  const voirDetail = (id) => navigate(`/liste-courses/${id}/details`);  
 
   const startEditing = (liste) => {
     setEditingId(liste.id);
