@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Toast, ToastContainer, Button, Form, Card } from 'react-bootstrap';
-import Header from './Header'; // Assurez-vous que le chemin est correct
+import Header from './Header';
 
 export default function ListeCourseDetails() {
   const { listeId } = useParams();
@@ -60,8 +60,11 @@ export default function ListeCourseDetails() {
   };
 
   const handleUpdatePostIt = () => {
+    if (!editingPostItId) return;
     axios
-      .put(`http://localhost:8080/postits/${editingPostItId}`, { contenu: editingContent })
+      .put(`http://localhost:8080/listesCourses/${listeId}/postits/${editingPostItId}`, {
+        contenu: editingContent
+      })
       .then(() => {
         showToast('Post-it modifié');
         setEditingPostItId(null);
@@ -83,7 +86,6 @@ export default function ListeCourseDetails() {
 
   const handleAjouterTousAuPanier = async () => {
     if (!clientId || !details || !details.produits.length) return;
-
     try {
       await Promise.all(
         details.produits.map((produit) =>
@@ -118,7 +120,6 @@ export default function ListeCourseDetails() {
         <div className="mb-5">
           <h4>Post-its</h4>
           <div className="row">
-            {/* Carte de création */}
             <div className="col-md-3 mb-3">
               <Card className="bg-light p-2 shadow-sm">
                 <Form.Control
@@ -133,8 +134,6 @@ export default function ListeCourseDetails() {
                 </Button>
               </Card>
             </div>
-
-            {/* Cartes post-it existants */}
             {details.postIts.map((p) => (
               <div key={p.id} className="col-md-3 mb-3">
                 <Card className="bg-warning-subtle p-2 shadow-sm">
@@ -159,10 +158,18 @@ export default function ListeCourseDetails() {
                     <>
                       <Card.Text className="mb-2">{p.contenu}</Card.Text>
                       <div className="d-flex justify-content-between">
-                        <Button size="sm" variant="outline-primary" onClick={() => handleEditPostIt(p.id, p.contenu)}>
+                        <Button
+                          size="sm"
+                          variant="outline-primary"
+                          onClick={() => handleEditPostIt(p.id, p.contenu)}
+                        >
                           Modifier
                         </Button>
-                        <Button size="sm" variant="outline-danger" onClick={() => handleDeletePostIt(p.id)}>
+                        <Button
+                          size="sm"
+                          variant="outline-danger"
+                          onClick={() => handleDeletePostIt(p.id)}
+                        >
                           Supprimer
                         </Button>
                       </div>
@@ -207,7 +214,6 @@ export default function ListeCourseDetails() {
           )}
         </div>
 
-        {/* Ajouter au panier en bas */}
         {details.produits.length > 0 && (
           <div className="text-end mt-4 mb-5">
             <Button variant="success" onClick={handleAjouterTousAuPanier}>
@@ -216,7 +222,6 @@ export default function ListeCourseDetails() {
           </div>
         )}
 
-        {/* Toast */}
         <ToastContainer position="top-center">
           <Toast bg={toast.bg} show={toast.show} onClose={() => setToast({ ...toast, show: false })}>
             <Toast.Body>{toast.message}</Toast.Body>
