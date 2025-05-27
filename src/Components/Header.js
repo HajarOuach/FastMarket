@@ -10,7 +10,7 @@ function Header({ onLogout }) {
 
   const handleLogout = () => {
     if (onLogout) onLogout();
-    navigate('/', { state: { user } });
+    navigate('/');
   };
 
   const handleLoginClick = () => {
