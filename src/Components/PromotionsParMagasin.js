@@ -1,5 +1,5 @@
 import React from 'react';
-
+ 
 const PromotionsParMagasin = ({ magasinId }) => {
   const promosParMagasin = {
     1: [
@@ -50,7 +50,7 @@ const PromotionsParMagasin = ({ magasinId }) => {
      
       {
         title: "Bons de réduction",
-        description: "Jusqu'à -50% sur les produits d'ygène",
+        description: "Jusqu'à -50% sur les produits d'hygiène",
         image: "/images/hyg.jpeg",
       }
     ],
@@ -68,7 +68,7 @@ const PromotionsParMagasin = ({ magasinId }) => {
       
       {
         title: "Bons de réduction",
-        description: "Jusqu'à -40% sur les boissons",
+        description: "Jusqu'à -40% sur les produits ménagers",
         image: "/images/menage.jpg",
       },
     ],
@@ -85,7 +85,7 @@ const PromotionsParMagasin = ({ magasinId }) => {
       },
       {
         title: "Bons de réduction",
-        description: "Jusqu'à -40% sur les boissons",
+        description: "Jusqu'à -40% sur les fruits et légumes",
         image: "/images/LG.jpg",
       },
     ],

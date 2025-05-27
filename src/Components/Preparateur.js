@@ -6,30 +6,48 @@ export default function GestionCommandes() {
   const [commandeActive, setCommandeActive] = useState(null);
 
   useEffect(() => {
+    const magasinId = localStorage.getItem("magasinId");
+
+    if (!magasinId) {
+      console.error("Magasin ID introuvable dans le localStorage.");
+      return;
+    }
+
     axios
-      .get("http://localhost:8080/commandes/preparateur/32/commandes/commandees")
-      .then((res) => setCommandes(res.data))
-      .catch((err) => console.error("Erreur lors du chargement :", err));
+      .get(`http://localhost:8080/commandes/magasin/${magasinId}/commandes/commandees`)
+      .then((res) => {
+        console.log("Commandes récupérées :", res.data);
+        setCommandes(res.data);
+      })
+      .catch((err) => console.error("Erreur lors de la récupération :", err));
   }, []);
 
   const changerStatut = (commandeId, nouveauStatut) => {
+    const preparateurId = parseInt(localStorage.getItem("preparateurId"));
+
     if (nouveauStatut === "En cours de traitement") {
+      if (!preparateurId || isNaN(preparateurId)) {
+        console.error("preparateurId invalide ou manquant dans le localStorage");
+        return;
+      }
+
       axios
         .put("http://localhost:8080/commandes/traiter", {
           commandeId,
-          preparateurId: 32,
+          preparateurId,
         })
         .then(() => majCommandeLocalement(commandeId, nouveauStatut))
-        .catch((err) => console.error(err));
+        .catch((err) => console.error("Erreur lors du traitement :", err));
     } else if (nouveauStatut === "Traité") {
       axios
         .put("http://localhost:8080/commandes/marquerTraitee", {
           commandeId,
         })
         .then(() => majCommandeLocalement(commandeId, nouveauStatut))
-        .catch((err) => console.error(err));
+        .catch((err) => console.error("Erreur lors de la finalisation :", err));
+
+
     } else if (nouveauStatut === "Annulée") {
-      // Pas encore de route côté back, on l'actualise seulement en local
       majCommandeLocalement(commandeId, nouveauStatut);
     }
   };
@@ -100,7 +118,7 @@ export default function GestionCommandes() {
             <ul>
               {commandeActive.lignesCommande.map((ligne) => (
                 <li key={ligne.id}>
-                  Produit : <strong>{ligne.produit?.libelle}</strong> <br></br> 
+                  Produit : <strong>{ligne.produit?.libelle}</strong> <br />
                   Quantité : <strong>{ligne.quantite}</strong>
                 </li>
               ))}
@@ -114,31 +132,26 @@ export default function GestionCommandes() {
         .container {
           padding: 2rem;
         }
-
         .title {
           font-size: 2rem;
           font-weight: bold;
           margin-bottom: 2rem;
         }
-
         .commande-table {
           width: 100%;
           border-collapse: collapse;
         }
-
         .commande-table th,
         .commande-table td {
           border: 1px solid #ccc;
           padding: 0.5rem;
           text-align: center;
         }
-
         .actions {
           display: flex;
           gap: 0.5rem;
           justify-content: center;
         }
-
         .btn {
           padding: 0.5rem 1rem;
           border-radius: 6px;
@@ -147,23 +160,18 @@ export default function GestionCommandes() {
           color: white;
           font-weight: bold;
         }
-
         .btn.yellow {
           background-color: #facc15;
         }
-
         .btn.green {
           background-color: #22c55e;
         }
-
         .btn.blue {
           background-color: #3b82f6;
         }
-
         .btn.red {
           background-color: #ef4444;
         }
-
         .popup-overlay {
           position: fixed;
           top: 0;
@@ -175,7 +183,6 @@ export default function GestionCommandes() {
           align-items: center;
           justify-content: center;
         }
-
         .popup {
           background: white;
           padding: 2rem;
@@ -183,13 +190,11 @@ export default function GestionCommandes() {
           max-width: 400px;
           width: 100%;
         }
-
         .popup ul {
           margin-top: 1rem;
           list-style: none;
           padding: 0;
         }
-
         .popup li {
           margin-bottom: 0.5rem;
         }

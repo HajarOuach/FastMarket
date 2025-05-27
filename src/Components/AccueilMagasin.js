@@ -23,7 +23,6 @@ const AccueilMagasin = () => {
 
  return (
   <>
-    <Header />  {/* ✅ Affiche le Header */}
     <div className="container">
         <HeroSection nomMagasin={magasin.nom} />
       <PromotionsParMagasin magasinId={id} />
