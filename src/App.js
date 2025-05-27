@@ -19,11 +19,13 @@ import PageGerant from './Components/PageGerant';
 
 import Panier from './Components/Panier';
 import ListeProduits from './Components/ListeProduits';
+import ListeCourses from './Components/ListeCourses';
+import ListeCourseDetails from "./Components/ListeCourseDetails";
 
 function App() {
   const location = useLocation();
   const userState = location.state?.user;
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("client")) || userState || null);
   const [produits, setProduits] = useState([]);
   const [produitsLoaded, setProduitsLoaded] = useState(false);
   console.log(" App User state:", userState);
@@ -47,16 +49,16 @@ function App() {
     setUser(null);
   };
 
+  if (user && !user.role) handleLogout(); // Si le user n'a pas de rôle, on le déconnecte
+
+  const magasinStorage = JSON.parse(localStorage.getItem("magasin")); // au cas où seul l'id est stocké
+  const magasinId = user?.magasin?.id || magasinStorage?.id || magasinStorage;
+
   return (
     <>
       <Routes>
         <Route path="/" element={
-          user ? (
-            user.role === "client" ? <Navigate to="/login" /> :
-            user.role === "gerant" ? <Navigate to="/gerant" /> :
-            user.role === "preparateur" ? <Navigate to="/preparateur" /> :
-            <Navigate to="/login" />
-          ) : <ChoixProfil />
+          <ChoixProfil />
         } />
 
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
@@ -68,10 +70,15 @@ function App() {
               <HeroSection />
               <Categories />
             </>
-          ) : <Navigate to="/login" />
+          ) : <Navigate to="/" />
         } />
 
-        <Route path="/accueil-magasin/:id" element={<AccueilMagasin />} />
+        <Route path="/accueil-magasin/:id" element={
+          <>
+            <Header onLogout={handleLogout} />
+            <AccueilMagasin />
+          </>
+        } />
 
         <Route path="/gerant" element={
           user?.role === "gerant" ? (
@@ -79,7 +86,7 @@ function App() {
               <Header onLogout={handleLogout} />
               <PageGerant />
             </>
-          ) : <Navigate to="/login" />
+          ) : <Navigate to="/" />
         } />
 
         <Route path="/preparateur" element={
@@ -88,7 +95,7 @@ function App() {
               <Header onLogout={handleLogout} />
               <Preparateur />
             </>
-          ) : <Navigate to="/login" />
+          ) : <Navigate to="/" />
         } />
 
         <Route path="/catalogue" element={
@@ -97,7 +104,7 @@ function App() {
               <Header onLogout={handleLogout} />
               <Catalogue />
             </>
-          ) : <Navigate to="/login" />
+          ) : <Navigate to="/" />
         } />
 
         <Route path="/produits" element={
@@ -106,7 +113,7 @@ function App() {
               <Header onLogout={handleLogout} />
               <ListeProduits produits={produits} produitsLoaded={produitsLoaded} />
             </>
-          ) : <Navigate to="/login" />
+          ) : <Navigate to="/" />
         } />
 
         <Route path="/panier" element={
@@ -115,10 +122,30 @@ function App() {
               <Header onLogout={handleLogout} />
               <Panier />
             </>
-          ) : <Navigate to={`/login?role=client`} />
+          ) : <Navigate to={`/`} />
         } />
 
-        <Route path="/choix-magasin" element={<ChoixMagasin />} />
+        <Route path="/liste-courses" element={
+          user ? (
+            <>
+              <Header onLogout={handleLogout} />
+              <ListeCourses produits={produits} produitsLoaded={produitsLoaded} />
+            </>
+          ) : <Navigate to={`/`} />
+        } />
+
+        <Route path="/liste-courses/:listeId/details/" element={
+          <>
+            <Header onLogout={handleLogout} />
+            <ListeCourseDetails />
+          </>
+        } />
+
+        <Route path="/choix-magasin" element={
+          <>
+            <ChoixMagasin />
+          </>
+        } />
       </Routes>
     </>
   );

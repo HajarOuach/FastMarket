@@ -1,13 +1,21 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import { Modal, Button } from "react-bootstrap";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Modal, Button, Form } from "react-bootstrap";
 import axios from "axios";
+import { propTypes } from "react-bootstrap/esm/Image";
 
 export default function ListeProduits() {
+  const navigate = useNavigate();
   const [produits, setProduits] = useState([]);
   const [produitsLoaded, setProduitsLoaded] = useState(false);
   const [selectedProduit, setSelectedProduit] = useState(null);
   const [quantities, setQuantities] = useState({});
+
+  const [showListeModal, setShowListeModal] = useState(false);
+  const [listesCourses, setListesCourses] = useState([]);
+  const [selectedListeId, setSelectedListeId] = useState(null);
+  const [produitToAdd, setProduitToAdd] = useState(null);
+
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const selectedCategorie = params.get("categorie");
@@ -15,6 +23,7 @@ export default function ListeProduits() {
 
   const client = JSON.parse(localStorage.getItem("client"));
   const clientId = client?.id;
+  const isGerant = client?.role === "gerant";
 
   useEffect(() => {
     if (!magasinId) return;
@@ -26,8 +35,7 @@ export default function ListeProduits() {
         const filtered = selectedCategorie
           ? allProduits.filter(
               (p) =>
-                p.categorie?.nom?.toLowerCase() ===
-                selectedCategorie.toLowerCase()
+                p.categorie?.nom?.toLowerCase() === selectedCategorie.toLowerCase()
             )
           : allProduits;
 
@@ -53,6 +61,9 @@ export default function ListeProduits() {
     }
   };
 
+
+  const handleDetail = (produit) => setSelectedProduit(produit);
+
   const handleClose = () => setSelectedProduit(null);
 
   const increaseQuantity = (id) =>
@@ -66,7 +77,8 @@ export default function ListeProduits() {
 
   const handleAjouter = async (produitId) => {
     if (!clientId) {
-      alert("Veuillez vous connecter pour ajouter un produit.");
+      if (window.confirm("Vous n'êtes pas connecté. Veuillez vous connecter pour ajouter des produits au panier."))
+          navigate("/");
       return;
     }
 
@@ -90,19 +102,42 @@ export default function ListeProduits() {
     }
   };
 
+  const openListeModal = (produit) => {
+    if (!clientId) {
+      if (window.confirm("Vous n'êtes pas connecté. Veuillez vous connecter pour ajouter des produits au panier."))
+          navigate("/");
+      return;
+    }
+    setProduitToAdd(produit);
+    setSelectedListeId(null);
+    setShowListeModal(true);
+  };
+
+  const handleAddToListe = async () => {
+    if (!selectedListeId || !produitToAdd) return;
+    try {
+      await axios.post(`http://localhost:8080/listesCourses/${selectedListeId}/produits`, {
+        produitId: produitToAdd.id,
+      });
+      alert("Produit ajouté à la liste !");
+      setShowListeModal(false);
+    } catch (err) {
+      console.error("Erreur ajout produit à la liste :", err);
+      alert("Erreur lors de l'ajout.");
+    }
+  };
+
   return (
     <div className="container mt-5">
       <h2 className="text-center mb-4">
-        {selectedCategorie
-          ? `Produits – ${selectedCategorie}`
-          : "Nos produits disponibles"}
+        {selectedCategorie ? selectedCategorie : "Nos produits disponibles"}
       </h2>
 
       {!produitsLoaded ? (
         <p className="text-center">Chargement...</p>
       ) : produits.length === 0 ? (
         <div className="col-12 text-center text-muted">
-          <p>😕 Aucun produit disponible pour cette catégorie ou ce magasin.</p>
+          <p>Aucun produit disponible pour cette catégorie ou ce magasin.</p>
         </div>
       ) : (
         <div className="row">
@@ -120,7 +155,6 @@ export default function ListeProduits() {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      position: "relative",
                     }}
                   >
                     <img
@@ -131,7 +165,6 @@ export default function ListeProduits() {
                         maxWidth: "100%",
                         objectFit: "contain",
                         zIndex: 1,
-                        position: "relative",
                       }}
                     />
                   </div>
@@ -143,46 +176,49 @@ export default function ListeProduits() {
                     {produit.prixUnitaire.toFixed(2)} €
                   </div>
 
-                  <div className="d-flex justify-content-center align-items-center mt-1 mb-1 gap-2">
-                    <button
-                      className="btn btn-warning btn-sm px-2 py-1"
-                      style={{ fontSize: "0.75rem" }}
-                      onClick={() => decreaseQuantity(produit.id)}
-                    >
-                      –
-                    </button>
-                    <span style={{ minWidth: "20px" }}>
-                      {quantities[produit.id] || 1}
-                    </span>
-                    <button
-                      className="btn btn-warning btn-sm px-2 py-1"
-                      style={{ fontSize: "0.75rem" }}
-                      onClick={() => increaseQuantity(produit.id)}
-                    >
-                      +
-                    </button>
-                  </div>
+                  {!isGerant && (
+                    <>
+                      <div className="d-flex justify-content-center align-items-center mt-1 mb-1 gap-2">
+                        <button
+                          className="btn btn-warning btn-sm px-2 py-1"
+                          onClick={() => decreaseQuantity(produit.id)}
+                        >
+                          –
+                        </button>
+                        <span style={{ minWidth: "20px" }}>
+                          {quantities[produit.id] || 1}
+                        </span>
+                        <button
+                          className="btn btn-warning btn-sm px-2 py-1"
+                          onClick={() => increaseQuantity(produit.id)}
+                        >
+                          +
+                        </button>
+                      </div>
 
-                  <div className="d-flex justify-content-center gap-2 mt-1">
-                    <button
-                      className="btn px-2 py-1 rounded-pill d-flex align-items-center gap-1"
-                      style={{
-                        fontSize: "0.75rem",
-                        backgroundColor: "#3cb371",
-                        color: "#fff",
-                        border: "none",
-                      }}
-                      onClick={() => handleAjouter(produit.id)}
-                    >
-                      <i className="bi bi-cart-plus" style={{ fontSize: "0.8rem" }}></i> Ajouter
-                    </button>
+                      <div className="d-flex justify-content-center gap-2 mt-1">
+                        <button
+                          className="btn btn-success btn-sm"
+                          onClick={() => handleAjouter(produit.id)}
+                        >
+                          <i className="bi bi-cart-plus" /> Panier
+                        </button>
+                        <button
+                          className="btn btn-outline-primary btn-sm"
+                          onClick={() => openListeModal(produit)}
+                        >
+                          + Liste
+                        </button>
+                      </div>
+                    </>
+                  )}
 
+                  <div className="d-flex justify-content-center mt-2">
                     <button
-                      className="btn btn-outline-secondary px-2 py-1 rounded-pill d-flex align-items-center gap-1"
-                      style={{ fontSize: "0.75rem" }}
+                      className="btn btn-outline-secondary btn-sm"
                       onClick={() => handleDetail(produit)}
                     >
-                      <i className="bi bi-info-circle" style={{ fontSize: "0.8rem" }}></i> Détail
+                      <i className="bi bi-info-circle" /> Détail
                     </button>
                   </div>
 
@@ -198,7 +234,6 @@ export default function ListeProduits() {
                         fontWeight: "bold",
                         padding: "3px 10px",
                         borderRadius: "50px",
-                        whiteSpace: "nowrap",
                         zIndex: 10,
                       }}
                     >
@@ -227,8 +262,7 @@ export default function ListeProduits() {
               <strong>Prix :</strong> {selectedProduit.prixUnitaire.toFixed(2)} €<br />
               {selectedProduit.marque && (
                 <>
-                  <strong>Marque :</strong> {selectedProduit.marque}
-                  <br />
+                  <strong>Marque :</strong> {selectedProduit.marque}<br />
                 </>
               )}
               {selectedProduit.enPromotion && selectedProduit.typePromotion && (
@@ -302,6 +336,34 @@ export default function ListeProduits() {
           </Modal.Footer>
         </Modal>
       )}
+
+      {/* Modal pour ajouter à une liste */}
+      <Modal show={showListeModal} onHide={() => setShowListeModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Ajouter à une liste</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Select
+            value={selectedListeId || ""}
+            onChange={(e) => setSelectedListeId(e.target.value)}
+          >
+            <option value="">-- Choisir une liste --</option>
+            {listesCourses.map((liste) => (
+              <option key={liste.id} value={liste.id}>
+                {liste.nom}
+              </option>
+            ))}
+          </Form.Select>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowListeModal(false)}>
+            Annuler
+          </Button>
+          <Button variant="primary" onClick={handleAddToListe} disabled={!selectedListeId}>
+            Ajouter
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }
