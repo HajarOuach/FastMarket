@@ -79,7 +79,6 @@ function App() {
           user?.role === "gerant" ? (
             <>
               <Header onLogout={handleLogout} />
-              
               <PageGerant />
             </>
           ) : <Navigate to="/login" />
