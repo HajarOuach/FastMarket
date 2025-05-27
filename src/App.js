@@ -19,6 +19,8 @@ import PageGerant from './Components/PageGerant';
 
 import Panier from './Components/Panier';
 import ListeProduits from './Components/ListeProduits';
+import ListeCourses from './Components/ListeCourses';
+
 
 function App() {
   const location = useLocation();
@@ -114,6 +116,15 @@ function App() {
             <>
               <Header onLogout={handleLogout} />
               <Panier />
+            </>
+          ) : <Navigate to={`/login?role=client`} />
+        } />
+
+        <Route path="/liste-courses" element={
+          user ? (
+            <>
+              <Header onLogout={handleLogout} />
+              <ListeCourses produits={produits} produitsLoaded={produitsLoaded} />
             </>
           ) : <Navigate to={`/login?role=client`} />
         } />
